@@ -11,30 +11,54 @@ const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>('products');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   // Contraseña del dashboard - Desde variable de entorno o fallback
   const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'Elevate2024!Secure';
 
+  const handleAuthenticate = () => {
+    const trimmedPassword = password.trim();
+    if (trimmedPassword === ADMIN_PASSWORD) {
+      setError('');
+      setIsAuthenticated(true);
+    } else {
+      setError('CONTRASEÑA INCORRECTA');
+      setPassword('');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6">
-        <div className="w-full max-w-md border border-emerald-900/50 bg-neutral-900/20 p-8 backdrop-blur-md">
+      <div className="min-h-screen bg-black flex items-center justify-center p-6 relative z-[100]">
+        <div className="w-full max-w-md border border-emerald-900/50 bg-neutral-900/20 p-8 backdrop-blur-md relative z-[101]">
            <h1 className="font-display text-2xl text-emerald-500 mb-6 tracking-widest">ACCESO AL SISTEMA</h1>
            <input 
              type="password" 
              value={password}
-             onChange={(e) => setPassword(e.target.value)}
+             onChange={(e) => {
+               setPassword(e.target.value);
+               setError('');
+             }}
              onKeyDown={(e) => {
-               if (e.key === 'Enter' && password === ADMIN_PASSWORD) {
-                 setIsAuthenticated(true);
+               if (e.key === 'Enter') {
+                 handleAuthenticate();
                }
              }}
              className="w-full bg-black border border-gray-800 p-4 text-emerald-500 font-mono mb-4 focus:border-emerald-500 outline-none"
              placeholder="INGRESAR_CLAVE"
+             autoFocus
            />
+           {error && (
+             <div className="mb-4 text-red-500 text-sm font-mono text-center animate-pulse">
+               {error}
+             </div>
+           )}
            <button 
-             onClick={() => { if(password === ADMIN_PASSWORD) setIsAuthenticated(true) }}
-             className="w-full bg-emerald-900/20 border border-emerald-500/50 text-emerald-500 py-3 font-mono hover:bg-emerald-500 hover:text-black transition-all"
+             onClick={handleAuthenticate}
+             type="button"
+             className="w-full bg-emerald-900/20 border border-emerald-500/50 text-emerald-500 py-3 font-mono hover:bg-emerald-500 hover:text-black transition-all cursor-pointer relative z-[102]"
+             style={{ pointerEvents: 'auto' }}
            >
              AUTENTICAR
            </button>

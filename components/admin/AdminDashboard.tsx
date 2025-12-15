@@ -12,8 +12,8 @@ const AdminDashboard: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
 
-  // Contraseña del dashboard - Cambiar por una segura
-  const ADMIN_PASSWORD = 'Elevate2024!Secure';
+  // Contraseña del dashboard - Desde variable de entorno o fallback
+  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'Elevate2024!Secure';
 
   if (!isAuthenticated) {
     return (

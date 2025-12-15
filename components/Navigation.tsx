@@ -28,16 +28,17 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeView }) =>
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavClick = (view: ViewState) => {
-    onChangeView(view);
+  const handleNavClick = (view: string | ViewState) => {
+    const viewState = view as ViewState;
+    onChangeView(viewState);
     setIsOpen(false);
     // Update URL without page reload
-    if (view === 'about-us') {
+    if (viewState === 'about-us') {
       window.history.pushState({}, '', '/about-us');
-    } else if (view === 'home') {
+    } else if (viewState === 'home') {
       window.history.pushState({}, '', '/');
     } else {
-      window.history.pushState({}, '', `/${view}`);
+      window.history.pushState({}, '', `/${viewState}`);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

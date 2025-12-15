@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Cpu, Cloud, Database, Network, Lock, Shield, Code, Server, Box } from 'lucide-react';
+import { Cpu, Cloud, Database, Network, Shield, Code, Server, Box } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 
 const ICONS: Record<string, React.ReactNode> = {

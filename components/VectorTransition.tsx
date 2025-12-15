@@ -1,21 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
 
-// Helper to generate random jagged path data
-const generateJaggedPath = (width: number, height: number, spikes: number) => {
-  let path = `M0,0 L${width},0 L${width},${height} L0,${height} Z`; // Fallback rect
-  // Create a jagged line down the right side
-  let jagged = `M0,0 L${width},0 `;
-  const segmentHeight = height / spikes;
-  for (let i = 0; i <= spikes; i++) {
-    const x = width - (Math.random() * 40); // Random variance
-    const y = i * segmentHeight;
-    jagged += `L${x},${y} `;
-  }
-  jagged += `L0,${height} Z`;
-  return jagged;
-};
-
 const VectorTransition: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -29,7 +14,6 @@ const VectorTransition: React.FC = () => {
   // --- TRANSFORMS ---
 
   // 1. Expansion: Pulls the two halves apart
-  const gapSize = useTransform(smoothScroll, [0.2, 0.8], [0, 200]);
   const leftX = useTransform(smoothScroll, [0.2, 0.8], ["0%", "-15%"]);
   const rightX = useTransform(smoothScroll, [0.2, 0.8], ["0%", "15%"]);
 

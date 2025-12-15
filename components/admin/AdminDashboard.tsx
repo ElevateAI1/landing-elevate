@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '../../contexts/DataContext';
-import { Trash2, Plus, Edit, Save, X, Terminal, Database, Users, Box, MessageSquare, Building2 } from 'lucide-react';
+import { Trash2, Plus, Edit, Save, X, Terminal, Users, Box, MessageSquare, Building2 } from 'lucide-react';
 import { Service, BlogPost, Partner, Testimonial, TeamMember } from '../../types';
 
 type AdminTab = 'blogs' | 'partners' | 'products' | 'testimonials' | 'industries' | 'team';

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { useData } from '../../contexts/DataContext';
 import { FileText, X, Eye, Share2, ScanLine } from 'lucide-react';

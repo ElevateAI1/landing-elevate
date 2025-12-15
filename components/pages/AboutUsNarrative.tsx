@@ -1,6 +1,6 @@
 
-import React, { useRef, useState, useMemo } from 'react';
-import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePresence } from 'framer-motion';
+import React, { useRef, useState } from 'react';
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { useData } from '../../contexts/DataContext';
 import { Users, Sparkles, Target, Code, Shield, Zap } from 'lucide-react';
 

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useMotionValue, useSpring, MotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useData } from '../../contexts/DataContext';
 import { ArrowRight, ShieldAlert, Cpu, Lock } from 'lucide-react';
 
@@ -163,7 +163,7 @@ const ProductsNarrative: React.FC = () => {
                                         </div>
                                         
                                         <div className="space-y-3 translate-z-20">
-                                            {product.features.slice(0, 3).map((f, i) => (
+                                            {product.features.slice(0, 3).map((_f, i) => (
                                                 <div key={i} className="group/bar">
                                                     <div className="flex justify-between text-[10px] text-gray-500 font-mono mb-1">
                                                         <span>PARAM_{i}</span>

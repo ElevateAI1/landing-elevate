@@ -14,7 +14,6 @@ const AudioPlayer: React.FC = () => {
 
   // Load preference from localStorage on mount
   useEffect(() => {
-    const savedState = localStorage.getItem('audioEnabled');
     const savedVolume = localStorage.getItem('audioVolume');
     const savedExpanded = localStorage.getItem('audioExpanded');
     

@@ -1,5 +1,5 @@
 
-import { Service, Testimonial, TeamMember, CaseStudy, BlogPost, Partner, NavItem } from './types';
+import { Service, Testimonial, BlogPost, Partner, NavItem } from './types';
 
 const NAV_ITEMS_EN: NavItem[] = [
   { label: 'Home', view: 'home' },

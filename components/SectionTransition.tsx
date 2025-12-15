@@ -36,7 +36,6 @@ const SectionTransition: React.FC<SectionTransitionProps> = ({ variant, height =
 
 // Variant 1: The Construct (Grid Planes)
 const ConstructVariant = ({ scrollY }: { scrollY: MotionValue<number> }) => {
-  const rotateX = useTransform(scrollY, [0, 1], [45, 80]);
   const yTop = useTransform(scrollY, [0, 1], ["-20%", "-100%"]);
   const yBottom = useTransform(scrollY, [0, 1], ["20%", "100%"]);
   const opacity = useTransform(scrollY, [0.2, 0.5, 0.8], [0, 1, 0]);
@@ -106,7 +105,7 @@ const TunnelVariant = ({ scrollY }: { scrollY: MotionValue<number> }) => {
     
     return (
         <div className="relative w-full h-full flex items-center justify-center perspective-[500px]">
-            {gates.map((gate, i) => {
+            {gates.map((_gate, i) => {
                 const scale = useTransform(scrollY, [0, 1], [0.2 + (i * 0.2), 2 + (i * 0.5)]);
                 const opacity = useTransform(scrollY, [0, 0.5, 0.9], [0, 1, 0]);
                 const rotate = useTransform(scrollY, [0, 1], [0, (i % 2 === 0 ? 45 : -45)]);

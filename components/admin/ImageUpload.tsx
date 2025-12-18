@@ -50,12 +50,12 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         onImageChange(url);
         setPreview(url);
       } else {
-        alert('Error al subir la imagen. Intenta de nuevo.');
+        alert('❌ Error al subir la imagen.\n\nVerifica:\n1. Que el bucket "images" exista en Supabase Storage\n2. Que el bucket sea público\n3. Que las políticas de Storage estén configuradas\n\nRevisa la consola para más detalles.');
         setPreview(currentImage || null);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading image:', error);
-      alert('Error al subir la imagen. Intenta de nuevo.');
+      alert(`❌ Error al subir la imagen: ${error?.message || 'Error desconocido'}\n\nRevisa la consola para más detalles.`);
       setPreview(currentImage || null);
     } finally {
       setUploading(false);

@@ -72,6 +72,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const loadAllData = async () => {
     if (!supabase) {
+      console.warn('⚠️ Supabase no está configurado. Los datos NO se guardarán permanentemente.');
+      console.warn('📝 Configura VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en Vercel.');
       setLoading(false);
       return;
     }
@@ -153,8 +155,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           image_url: t.image_url
         })));
       }
-    } catch (error) {
-      console.error('Error loading data from Supabase:', error);
+    } catch (error: any) {
+      console.error('❌ Error al cargar datos desde Supabase:', error?.message || error);
+      console.error('📝 Verifica que:');
+      console.error('   1. Las tablas existan (ejecuta database/02_create_tables.sql)');
+      console.error('   2. Las políticas RLS estén configuradas (ejecuta database/03_create_policies.sql)');
+      console.error('   3. Las variables de entorno estén configuradas en Vercel');
     } finally {
       setLoading(false);
     }

@@ -14,7 +14,7 @@ export const supabase = supabaseUrl && supabaseAnonKey
 // Helper para subir imágenes
 export const uploadImage = async (file: File, folder: string): Promise<string | null> => {
   if (!supabase) {
-    console.error('Supabase not configured');
+    console.error('❌ Supabase no está configurado. Verifica las variables VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en Vercel.');
     return null;
   }
 
@@ -30,7 +30,17 @@ export const uploadImage = async (file: File, folder: string): Promise<string | 
       });
 
     if (error) {
-      console.error('Error uploading image:', error);
+      if (error.message.includes('Bucket not found')) {
+        console.error('❌ Error: El bucket "images" no existe en Supabase Storage.');
+        console.error('📝 Solución: Ve a Supabase → Storage → Crea un bucket llamado "images" y márcalo como público.');
+      } else {
+        console.error('❌ Error al subir imagen:', error.message);
+      }
+      return null;
+    }
+
+    if (!data) {
+      console.error('❌ No se recibieron datos al subir la imagen');
       return null;
     }
 
@@ -39,9 +49,10 @@ export const uploadImage = async (file: File, folder: string): Promise<string | 
       .from('images')
       .getPublicUrl(data.path);
 
+    console.log('✅ Imagen subida exitosamente:', publicUrl);
     return publicUrl;
-  } catch (error) {
-    console.error('Error uploading image:', error);
+  } catch (error: any) {
+    console.error('❌ Error inesperado al subir imagen:', error?.message || error);
     return null;
   }
 };

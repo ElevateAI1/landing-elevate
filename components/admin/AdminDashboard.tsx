@@ -5,6 +5,7 @@ import { useData } from '../../contexts/DataContext';
 import { Trash2, Plus, Edit, Save, X, Terminal, Users, Box, MessageSquare, Building2 } from 'lucide-react';
 import { Service, BlogPost, Partner, Testimonial, TeamMember } from '../../types';
 import { ImageUpload } from './ImageUpload';
+import { generateUUID } from '../../lib/utils';
 
 type AdminTab = 'blogs' | 'partners' | 'products' | 'testimonials' | 'industries' | 'team';
 
@@ -136,7 +137,7 @@ const ProductManager = () => {
     if (!formData.title || !formData.description || !formData.price) return;
     
     const newProduct: Service = {
-      id: editingId || Date.now().toString(),
+      id: editingId || generateUUID(),
       title: formData.title,
       description: formData.description,
       price: formData.price,
@@ -265,7 +266,7 @@ const BlogManager = () => {
     if (!formData.title || !formData.excerpt || !formData.image) return;
     
     const newBlog: BlogPost = {
-      id: editingId || Date.now().toString(),
+      id: editingId || generateUUID(),
       title: formData.title,
       excerpt: formData.excerpt,
       image: formData.image,
@@ -403,7 +404,7 @@ const PartnerManager = () => {
     if (!partnerName.trim()) return;
     
     const partnerData: Partner = {
-      id: editingId || Date.now().toString(),
+      id: editingId || generateUUID(),
       name: partnerName,
       logo_url: logoUrl || undefined
     };
@@ -518,7 +519,7 @@ const TestimonialManager = () => {
     if (!formData.quote || !formData.author) return;
     
     const newTestimonial: Testimonial = {
-      id: editingId || Date.now().toString(),
+      id: editingId || generateUUID(),
       quote: formData.quote,
       author: formData.author,
       role: formData.role || '',
@@ -732,7 +733,7 @@ const TeamManager = () => {
     if (!formData.name?.trim() || !formData.role?.trim() || !formData.bio?.trim()) return;
     
     const newMember: TeamMember = {
-      id: editingId || `team-${Date.now()}`,
+      id: editingId || generateUUID(),
       name: formData.name,
       role: formData.role,
       bio: formData.bio,

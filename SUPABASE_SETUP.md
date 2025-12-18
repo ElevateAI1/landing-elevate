@@ -61,46 +61,22 @@ Esta guía te ayudará a configurar Supabase para que el admin dashboard funcion
 
 ### 6. Configurar Políticas de Storage
 
-Después de crear el bucket `images`:
+**Opción A: Usando SQL Editor (RECOMENDADO - Más rápido)**
+
+1. En Supabase, ve a **SQL Editor**
+2. Abre el archivo `database/05_create_storage_policies.sql`
+3. Copia todo el contenido
+4. Pégalo en el SQL Editor
+5. Click en **Run**
+
+Esto creará todas las políticas necesarias de una vez.
+
+**Opción B: Usando la interfaz de Storage**
 
 1. Click en el bucket `images`
 2. Ve a la pestaña **Policies**
 3. Click en **New Policy** → **For full customization**
-
-**Política de Lectura (SELECT):**
-```sql
-CREATE POLICY "Public Access"
-ON storage.objects FOR SELECT
-USING ( bucket_id = 'images' );
-```
-
-**Política de Escritura (INSERT):**
-```sql
-CREATE POLICY "Authenticated users can upload"
-ON storage.objects FOR INSERT
-WITH CHECK ( bucket_id = 'images' );
-```
-
-O si quieres que cualquiera pueda subir (menos seguro pero más fácil para testing):
-```sql
-CREATE POLICY "Anyone can upload"
-ON storage.objects FOR INSERT
-WITH CHECK ( bucket_id = 'images' );
-```
-
-**Política de Actualización (UPDATE):**
-```sql
-CREATE POLICY "Authenticated users can update"
-ON storage.objects FOR UPDATE
-USING ( bucket_id = 'images' );
-```
-
-**Política de Eliminación (DELETE):**
-```sql
-CREATE POLICY "Authenticated users can delete"
-ON storage.objects FOR DELETE
-USING ( bucket_id = 'images' );
-```
+4. Crea cada política manualmente (más lento)
 
 ### 7. Verificar Configuración
 
@@ -116,6 +92,7 @@ USING ( bucket_id = 'images' );
 - [ ] Script `02_create_tables.sql` ejecutado
 - [ ] Script `03_create_policies.sql` ejecutado
 - [ ] Bucket `images` creado en Storage
+- [ ] Script `05_create_storage_policies.sql` ejecutado
 - [ ] Bucket `images` marcado como público
 - [ ] Políticas de Storage configuradas
 - [ ] Redeploy en Vercel realizado

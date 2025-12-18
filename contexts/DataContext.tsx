@@ -79,6 +79,30 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     try {
+      // Cargar products
+      const { data: productsData } = await supabase
+        .from('products')
+        .select(`
+          *,
+          product_features (
+            feature_text,
+            display_order
+          )
+        `)
+        .order('display_order', { ascending: true });
+      
+      if (productsData && productsData.length > 0) {
+        setProducts(productsData.map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          description: p.description,
+          price: p.price,
+          features: (p.product_features || [])
+            .sort((a: any, b: any) => a.display_order - b.display_order)
+            .map((f: any) => f.feature_text)
+        })));
+      }
+
       // Cargar blogs
       const { data: blogsData } = await supabase
         .from('blog_posts')
@@ -493,12 +517,112 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // --- Products CRUD (mantener local por ahora) ---
-  const addProduct = async (item: Service) => setProducts([...products, item]);
-  const updateProduct = async (id: string, item: Service) => {
-    setProducts(products.map(p => p.id === id ? item : p));
+  // --- Products CRUD ---
+  const addProduct = async (item: Service) => {
+    const previousProducts = products;
+    setProducts([...products, item]);
+    if (supabase) {
+      try {
+        // Insertar producto
+        const { data: productData, error: productError } = await supabase
+          .from('products')
+          .insert({
+            id: item.id,
+            title: item.title,
+            description: item.description,
+            price: item.price
+          })
+          .select()
+          .single();
+        
+        if (productError) throw productError;
+
+        // Insertar features si existen
+        if (item.features && item.features.length > 0 && productData) {
+          const featuresToInsert = item.features.map((feature, index) => ({
+            product_id: productData.id,
+            feature_text: feature,
+            display_order: index
+          }));
+
+          const { error: featuresError } = await supabase
+            .from('product_features')
+            .insert(featuresToInsert);
+          
+          if (featuresError) throw featuresError;
+        }
+      } catch (error) {
+        console.error('Error adding product:', error);
+        setProducts(previousProducts);
+      }
+    }
   };
-  const deleteProduct = async (id: string) => setProducts(products.filter(p => p.id !== id));
+
+  const updateProduct = async (id: string, item: Service) => {
+    const previousProducts = products;
+    const updated = products.map(p => p.id === id ? item : p);
+    setProducts(updated);
+    if (supabase) {
+      try {
+        // Actualizar producto
+        const { error: productError } = await supabase
+          .from('products')
+          .update({
+            title: item.title,
+            description: item.description,
+            price: item.price
+          })
+          .eq('id', id);
+        
+        if (productError) throw productError;
+
+        // Eliminar features antiguas
+        const { error: deleteError } = await supabase
+          .from('product_features')
+          .delete()
+          .eq('product_id', id);
+        
+        if (deleteError) throw deleteError;
+
+        // Insertar nuevas features
+        if (item.features && item.features.length > 0) {
+          const featuresToInsert = item.features.map((feature, index) => ({
+            product_id: id,
+            feature_text: feature,
+            display_order: index
+          }));
+
+          const { error: featuresError } = await supabase
+            .from('product_features')
+            .insert(featuresToInsert);
+          
+          if (featuresError) throw featuresError;
+        }
+      } catch (error) {
+        console.error('Error updating product:', error);
+        setProducts(previousProducts);
+      }
+    }
+  };
+
+  const deleteProduct = async (id: string) => {
+    const previousProducts = products;
+    const filtered = products.filter(p => p.id !== id);
+    setProducts(filtered);
+    if (supabase) {
+      try {
+        // Las features se eliminan automáticamente por CASCADE
+        const { error } = await supabase
+          .from('products')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        setProducts(previousProducts);
+      }
+    }
+  };
 
   return (
     <DataContext.Provider value={{

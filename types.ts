@@ -22,6 +22,7 @@ export interface TeamMember {
   role: string;
   bio: string;
   isFounder?: boolean;
+  image_url?: string;
 }
 
 export type ViewState = 'home' | 'products' | 'intelligence' | 'network' | 'about-us' | 'contact' | 'admin';
@@ -52,4 +53,5 @@ export interface BlogPost {
 export interface Partner {
   id: string;
   name: string;
+  logo_url?: string;
 }

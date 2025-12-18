@@ -1,7 +1,7 @@
-
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Service, BlogPost, Partner, Testimonial, TeamMember } from '../types';
 import { CONTENT } from '../constants';
+import { supabase } from '../lib/supabase';
 
 // Initial Data Loading from Constants (Using Spanish content)
 const INITIAL_PRODUCTS = CONTENT.es.services;
@@ -33,24 +33,25 @@ interface DataContextType {
   testimonials: Testimonial[];
   industries: string[];
   teamMembers: TeamMember[];
-  addProduct: (item: Service) => void;
-  updateProduct: (id: string, item: Service) => void;
-  deleteProduct: (id: string) => void;
-  addBlog: (item: BlogPost) => void;
-  updateBlog: (id: string, item: BlogPost) => void;
-  deleteBlog: (id: string) => void;
-  addPartner: (item: Partner) => void;
-  updatePartner: (id: string, item: Partner) => void;
-  deletePartner: (id: string) => void;
-  addTestimonial: (item: Testimonial) => void;
-  updateTestimonial: (id: string, item: Testimonial) => void;
-  deleteTestimonial: (id: string) => void;
-  addIndustry: (industry: string) => void;
-  updateIndustry: (index: number, industry: string) => void;
-  deleteIndustry: (index: number) => void;
-  addTeamMember: (item: TeamMember) => void;
-  updateTeamMember: (id: string, item: TeamMember) => void;
-  deleteTeamMember: (id: string) => void;
+  loading: boolean;
+  addProduct: (item: Service) => Promise<void>;
+  updateProduct: (id: string, item: Service) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  addBlog: (item: BlogPost) => Promise<void>;
+  updateBlog: (id: string, item: BlogPost) => Promise<void>;
+  deleteBlog: (id: string) => Promise<void>;
+  addPartner: (item: Partner) => Promise<void>;
+  updatePartner: (id: string, item: Partner) => Promise<void>;
+  deletePartner: (id: string) => Promise<void>;
+  addTestimonial: (item: Testimonial) => Promise<void>;
+  updateTestimonial: (id: string, item: Testimonial) => Promise<void>;
+  deleteTestimonial: (id: string) => Promise<void>;
+  addIndustry: (industry: string) => Promise<void>;
+  updateIndustry: (index: number, industry: string) => Promise<void>;
+  deleteIndustry: (index: number) => Promise<void>;
+  addTeamMember: (item: TeamMember) => Promise<void>;
+  updateTeamMember: (id: string, item: TeamMember) => Promise<void>;
+  deleteTeamMember: (id: string) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -62,54 +63,440 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [testimonials, setTestimonials] = useState<Testimonial[]>(INITIAL_TESTIMONIALS);
   const [industries, setIndustries] = useState<string[]>(INITIAL_INDUSTRIES);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(INITIAL_TEAM);
+  const [loading, setLoading] = useState(true);
 
-  // --- Products CRUD ---
-  const addProduct = (item: Service) => setProducts([...products, item]);
-  const updateProduct = (id: string, item: Service) => {
-    setProducts(products.map(p => p.id === id ? item : p));
+  // Cargar datos desde Supabase al iniciar
+  useEffect(() => {
+    loadAllData();
+  }, []);
+
+  const loadAllData = async () => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Cargar blogs
+      const { data: blogsData } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (blogsData && blogsData.length > 0) {
+        setBlogs(blogsData.map(b => ({
+          id: b.id,
+          title: b.title,
+          excerpt: b.excerpt,
+          image: b.image || '',
+          date: b.date || '',
+          readTime: b.read_time || '',
+          category: b.category || '',
+          slug: b.slug
+        })));
+      }
+
+      // Cargar partners
+      const { data: partnersData } = await supabase
+        .from('partners')
+        .select('*')
+        .order('display_order', { ascending: true });
+      
+      if (partnersData && partnersData.length > 0) {
+        setPartners(partnersData.map(p => ({
+          id: p.id,
+          name: p.name,
+          logo_url: p.logo_url
+        })));
+      }
+
+      // Cargar testimonials
+      const { data: testimonialsData } = await supabase
+        .from('testimonials')
+        .select('*')
+        .order('display_order', { ascending: true });
+      
+      if (testimonialsData && testimonialsData.length > 0) {
+        setTestimonials(testimonialsData.map(t => ({
+          id: t.id,
+          quote: t.quote,
+          author: t.author,
+          role: t.role || '',
+          company: t.company || '',
+          industry: t.industry || ''
+        })));
+      }
+
+      // Cargar industries
+      const { data: industriesData } = await supabase
+        .from('industries')
+        .select('name')
+        .order('display_order', { ascending: true });
+      
+      if (industriesData && industriesData.length > 0) {
+        setIndustries(industriesData.map(i => i.name));
+      }
+
+      // Cargar team members
+      const { data: teamData } = await supabase
+        .from('team_members')
+        .select('*')
+        .order('display_order', { ascending: true });
+      
+      if (teamData && teamData.length > 0) {
+        setTeamMembers(teamData.map(t => ({
+          id: t.id,
+          name: t.name,
+          role: t.role,
+          bio: t.bio,
+          isFounder: t.is_founder || false,
+          image_url: t.image_url
+        })));
+      }
+    } catch (error) {
+      console.error('Error loading data from Supabase:', error);
+    } finally {
+      setLoading(false);
+    }
   };
-  const deleteProduct = (id: string) => setProducts(products.filter(p => p.id !== id));
 
   // --- Blogs CRUD ---
-  const addBlog = (item: BlogPost) => setBlogs([...blogs, item]);
-  const updateBlog = (id: string, item: BlogPost) => {
-    setBlogs(blogs.map(b => b.id === id ? item : b));
+  const addBlog = async (item: BlogPost) => {
+    const previousBlogs = blogs;
+    setBlogs([...blogs, item]);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('blog_posts')
+          .insert({
+            id: item.id,
+            title: item.title,
+            excerpt: item.excerpt,
+            image: item.image,
+            date: item.date,
+            read_time: item.readTime,
+            category: item.category,
+            slug: item.slug
+          });
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error adding blog:', error);
+        setBlogs(previousBlogs);
+      }
+    }
   };
-  const deleteBlog = (id: string) => setBlogs(blogs.filter(b => b.id !== id));
+
+  const updateBlog = async (id: string, item: BlogPost) => {
+    const previousBlogs = blogs;
+    const updated = blogs.map(b => b.id === id ? item : b);
+    setBlogs(updated);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('blog_posts')
+          .update({
+            title: item.title,
+            excerpt: item.excerpt,
+            image: item.image,
+            date: item.date,
+            read_time: item.readTime,
+            category: item.category,
+            slug: item.slug
+          })
+          .eq('id', id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error updating blog:', error);
+        setBlogs(previousBlogs);
+      }
+    }
+  };
+
+  const deleteBlog = async (id: string) => {
+    const previousBlogs = blogs;
+    const filtered = blogs.filter(b => b.id !== id);
+    setBlogs(filtered);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('blog_posts')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error deleting blog:', error);
+        setBlogs(previousBlogs);
+      }
+    }
+  };
 
   // --- Partners CRUD ---
-  const addPartner = (item: Partner) => setPartners([...partners, item]);
-  const updatePartner = (id: string, item: Partner) => {
-    setPartners(partners.map(p => p.id === id ? item : p));
+  const addPartner = async (item: Partner) => {
+    const previousPartners = partners;
+    setPartners([...partners, item]);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('partners')
+          .insert({
+            id: item.id,
+            name: item.name,
+            logo_url: item.logo_url
+          });
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error adding partner:', error);
+        setPartners(previousPartners);
+      }
+    }
   };
-  const deletePartner = (id: string) => setPartners(partners.filter(p => p.id !== id));
+
+  const updatePartner = async (id: string, item: Partner) => {
+    const previousPartners = partners;
+    const updated = partners.map(p => p.id === id ? item : p);
+    setPartners(updated);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('partners')
+          .update({
+            name: item.name,
+            logo_url: item.logo_url
+          })
+          .eq('id', id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error updating partner:', error);
+        setPartners(previousPartners);
+      }
+    }
+  };
+
+  const deletePartner = async (id: string) => {
+    const previousPartners = partners;
+    const filtered = partners.filter(p => p.id !== id);
+    setPartners(filtered);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('partners')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error deleting partner:', error);
+        setPartners(previousPartners);
+      }
+    }
+  };
 
   // --- Testimonials CRUD ---
-  const addTestimonial = (item: Testimonial) => setTestimonials([...testimonials, item]);
-  const updateTestimonial = (id: string, item: Testimonial) => {
-    setTestimonials(testimonials.map(t => t.id === id ? item : t));
+  const addTestimonial = async (item: Testimonial) => {
+    const previousTestimonials = testimonials;
+    setTestimonials([...testimonials, item]);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('testimonials')
+          .insert({
+            id: item.id,
+            quote: item.quote,
+            author: item.author,
+            role: item.role,
+            company: item.company,
+            industry: item.industry
+          });
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error adding testimonial:', error);
+        setTestimonials(previousTestimonials);
+      }
+    }
   };
-  const deleteTestimonial = (id: string) => setTestimonials(testimonials.filter(t => t.id !== id));
+
+  const updateTestimonial = async (id: string, item: Testimonial) => {
+    const previousTestimonials = testimonials;
+    const updated = testimonials.map(t => t.id === id ? item : t);
+    setTestimonials(updated);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('testimonials')
+          .update({
+            quote: item.quote,
+            author: item.author,
+            role: item.role,
+            company: item.company,
+            industry: item.industry
+          })
+          .eq('id', id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error updating testimonial:', error);
+        setTestimonials(previousTestimonials);
+      }
+    }
+  };
+
+  const deleteTestimonial = async (id: string) => {
+    const previousTestimonials = testimonials;
+    const filtered = testimonials.filter(t => t.id !== id);
+    setTestimonials(filtered);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('testimonials')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error deleting testimonial:', error);
+        setTestimonials(previousTestimonials);
+      }
+    }
+  };
 
   // --- Industries CRUD ---
-  const addIndustry = (industry: string) => setIndustries([...industries, industry]);
-  const updateIndustry = (index: number, industry: string) => {
+  const addIndustry = async (industry: string) => {
+    const previousIndustries = industries;
+    setIndustries([...industries, industry]);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('industries')
+          .insert({ name: industry });
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error adding industry:', error);
+        setIndustries(previousIndustries);
+      }
+    }
+  };
+
+  const updateIndustry = async (index: number, industry: string) => {
+    const previousIndustries = industries;
+    const oldIndustry = industries[index];
     const newIndustries = [...industries];
     newIndustries[index] = industry;
     setIndustries(newIndustries);
+    if (supabase) {
+      try {
+        // Necesitamos el ID de la industria, así que hacemos una búsqueda
+        const { data } = await supabase
+          .from('industries')
+          .select('id')
+          .eq('name', oldIndustry)
+          .single();
+        
+        if (data) {
+          const { error } = await supabase
+            .from('industries')
+            .update({ name: industry })
+            .eq('id', data.id);
+          if (error) throw error;
+        }
+      } catch (error) {
+        console.error('Error updating industry:', error);
+        setIndustries(previousIndustries);
+      }
+    }
   };
-  const deleteIndustry = (index: number) => setIndustries(industries.filter((_, i) => i !== index));
+
+  const deleteIndustry = async (index: number) => {
+    const previousIndustries = industries;
+    const industryToDelete = industries[index];
+    const filtered = industries.filter((_, i) => i !== index);
+    setIndustries(filtered);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('industries')
+          .delete()
+          .eq('name', industryToDelete);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error deleting industry:', error);
+        setIndustries(previousIndustries);
+      }
+    }
+  };
 
   // --- Team Members CRUD ---
-  const addTeamMember = (item: TeamMember) => setTeamMembers([...teamMembers, item]);
-  const updateTeamMember = (id: string, item: TeamMember) => {
-    setTeamMembers(teamMembers.map(t => t.id === id ? item : t));
+  const addTeamMember = async (item: TeamMember) => {
+    const previousTeamMembers = teamMembers;
+    setTeamMembers([...teamMembers, item]);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('team_members')
+          .insert({
+            id: item.id,
+            name: item.name,
+            role: item.role,
+            bio: item.bio,
+            is_founder: item.isFounder || false,
+            image_url: item.image_url
+          });
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error adding team member:', error);
+        setTeamMembers(previousTeamMembers);
+      }
+    }
   };
-  const deleteTeamMember = (id: string) => setTeamMembers(teamMembers.filter(t => t.id !== id));
+
+  const updateTeamMember = async (id: string, item: TeamMember) => {
+    const previousTeamMembers = teamMembers;
+    const updated = teamMembers.map(t => t.id === id ? item : t);
+    setTeamMembers(updated);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('team_members')
+          .update({
+            name: item.name,
+            role: item.role,
+            bio: item.bio,
+            is_founder: item.isFounder || false,
+            image_url: item.image_url
+          })
+          .eq('id', id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error updating team member:', error);
+        setTeamMembers(previousTeamMembers);
+      }
+    }
+  };
+
+  const deleteTeamMember = async (id: string) => {
+    const previousTeamMembers = teamMembers;
+    const filtered = teamMembers.filter(t => t.id !== id);
+    setTeamMembers(filtered);
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('team_members')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error deleting team member:', error);
+        setTeamMembers(previousTeamMembers);
+      }
+    }
+  };
+
+  // --- Products CRUD (mantener local por ahora) ---
+  const addProduct = async (item: Service) => setProducts([...products, item]);
+  const updateProduct = async (id: string, item: Service) => {
+    setProducts(products.map(p => p.id === id ? item : p));
+  };
+  const deleteProduct = async (id: string) => setProducts(products.filter(p => p.id !== id));
 
   return (
     <DataContext.Provider value={{
-      products, blogs, partners, testimonials, industries, teamMembers,
+      products, blogs, partners, testimonials, industries, teamMembers, loading,
       addProduct, updateProduct, deleteProduct,
       addBlog, updateBlog, deleteBlog,
       addPartner, updatePartner, deletePartner,

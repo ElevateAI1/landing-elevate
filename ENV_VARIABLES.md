@@ -29,16 +29,28 @@ VITE_ADMIN_PASSWORD=TuContraseñaSegura2024!
 
 ---
 
-## 🗄️ Variables para Base de Datos (Opcional - Futuro)
+## 🗄️ Variables para Base de Datos (REQUERIDO para persistencia)
 
-Cuando conectes la base de datos (Supabase o PostgreSQL), agrega estas variables:
+**IMPORTANTE:** Sin estas variables, los datos del admin dashboard NO se guardarán permanentemente. Se perderán al recargar la página.
 
-### Para Supabase:
+### Para Supabase (Recomendado):
 ```
 VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
 VITE_SUPABASE_ANON_KEY=tu-anon-key-aqui
-VITE_SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key-aqui
 ```
+
+**Pasos para configurar Supabase:**
+1. Crea un proyecto en [Supabase](https://supabase.com)
+2. Ve a Settings → API
+3. Copia la "Project URL" → `VITE_SUPABASE_URL`
+4. Copia la "anon public" key → `VITE_SUPABASE_ANON_KEY`
+5. Ejecuta los scripts SQL en `database/` para crear las tablas:
+   - `01_drop_database.sql` (opcional, solo si necesitas resetear)
+   - `02_create_tables.sql` (crea todas las tablas)
+   - `03_create_policies.sql` (configura permisos)
+   - `04_insert_initial_data.sql` (opcional, datos iniciales)
+6. Crea un bucket de Storage llamado `images` en Supabase Storage
+7. Configura políticas públicas de lectura para el bucket `images`
 
 ### Para PostgreSQL Directo:
 ```

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useData } from '../../contexts/DataContext';
 import { Trash2, Plus, Edit, Save, X, Terminal, Users, Box, MessageSquare, Building2 } from 'lucide-react';
 import { Service, BlogPost, Partner, Testimonial, TeamMember } from '../../types';
+import { ImageUpload } from './ImageUpload';
 
 type AdminTab = 'blogs' | 'partners' | 'products' | 'testimonials' | 'industries' | 'team';
 
@@ -260,7 +261,7 @@ const BlogManager = () => {
     setEditingId(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.excerpt || !formData.image) return;
     
     const newBlog: BlogPost = {
@@ -275,9 +276,9 @@ const BlogManager = () => {
     };
 
     if (editingId) {
-      updateBlog(editingId, newBlog);
+      await updateBlog(editingId, newBlog);
     } else {
-      addBlog(newBlog);
+      await addBlog(newBlog);
     }
     resetForm();
   };
@@ -315,11 +316,11 @@ const BlogManager = () => {
             value={formData.excerpt}
             onChange={(e) => setFormData({...formData, excerpt: e.target.value})}
           />
-          <input 
-            className="w-full bg-transparent border-b border-gray-700 p-2 text-white focus:border-emerald-500 outline-none"
-            placeholder="URL de Imagen"
-            value={formData.image}
-            onChange={(e) => setFormData({...formData, image: e.target.value})}
+          <ImageUpload
+            currentImage={formData.image}
+            onImageChange={(url) => setFormData({...formData, image: url})}
+            folder="blogs"
+            label="Imagen del Blog"
           />
           <div className="grid grid-cols-2 gap-4">
             <input 
@@ -396,22 +397,31 @@ const PartnerManager = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [partnerName, setPartnerName] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!partnerName.trim()) return;
     
+    const partnerData: Partner = {
+      id: editingId || Date.now().toString(),
+      name: partnerName,
+      logo_url: logoUrl || undefined
+    };
+    
     if (editingId) {
-      updatePartner(editingId, { id: editingId, name: partnerName });
+      await updatePartner(editingId, partnerData);
     } else {
-      addPartner({ id: Date.now().toString(), name: partnerName });
+      await addPartner(partnerData);
     }
     setPartnerName('');
+    setLogoUrl('');
     setIsAdding(false);
     setEditingId(null);
   };
 
   const startEdit = (partner: Partner) => {
     setPartnerName(partner.name);
+    setLogoUrl(partner.logo_url || '');
     setEditingId(partner.id);
     setIsAdding(true);
   };
@@ -432,20 +442,26 @@ const PartnerManager = () => {
         <motion.div 
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="mb-8 p-6 border border-emerald-500/30 bg-emerald-900/5"
+          className="mb-8 p-6 border border-emerald-500/30 bg-emerald-900/5 space-y-4"
         >
           <input 
-            className="w-full bg-transparent border-b border-gray-700 p-2 text-white focus:border-emerald-500 outline-none mb-4"
+            className="w-full bg-transparent border-b border-gray-700 p-2 text-white focus:border-emerald-500 outline-none"
             placeholder="Nombre del Socio"
             value={partnerName}
             onChange={(e) => setPartnerName(e.target.value)}
+          />
+          <ImageUpload
+            currentImage={logoUrl}
+            onImageChange={(url) => setLogoUrl(url)}
+            folder="partners"
+            label="Logo del Socio"
           />
           <div className="flex gap-2">
             <button onClick={handleSave} className="px-4 py-2 bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition-colors">
               <Save size={16} className="inline mr-2" />
               {editingId ? 'ACTUALIZAR' : 'CONFIRMAR'}
             </button>
-            <button onClick={() => { setPartnerName(''); setIsAdding(false); setEditingId(null); }} className="px-4 py-2 border border-gray-700 hover:border-gray-500 transition-colors">
+            <button onClick={() => { setPartnerName(''); setLogoUrl(''); setIsAdding(false); setEditingId(null); }} className="px-4 py-2 border border-gray-700 hover:border-gray-500 transition-colors">
               <X size={16} className="inline mr-2" />
               CANCELAR
                 </button>
@@ -455,15 +471,22 @@ const PartnerManager = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {partners.map(p => (
-          <div key={p.id} className="p-6 border border-white/5 bg-white/5 flex justify-between items-center hover:border-white/20 transition-all">
-            <span className="font-display text-sm">{p.name}</span>
-            <div className="flex gap-2">
-              <button onClick={() => startEdit(p)} className="text-gray-500 hover:text-emerald-500 transition-colors">
-                <Edit size={14} />
-              </button>
-              <button onClick={() => deletePartner(p.id)} className="text-red-900 hover:text-red-500 transition-colors">
-                <X size={14} />
-              </button>
+          <div key={p.id} className="p-6 border border-white/5 bg-white/5 flex flex-col gap-3 hover:border-white/20 transition-all">
+            {p.logo_url && (
+              <div className="w-full h-20 bg-gray-800 overflow-hidden">
+                <img src={p.logo_url} alt={p.name} className="w-full h-full object-contain" />
+              </div>
+            )}
+            <div className="flex justify-between items-center">
+              <span className="font-display text-sm">{p.name}</span>
+              <div className="flex gap-2">
+                <button onClick={() => startEdit(p)} className="text-gray-500 hover:text-emerald-500 transition-colors">
+                  <Edit size={14} />
+                </button>
+                <button onClick={() => deletePartner(p.id)} className="text-red-900 hover:text-red-500 transition-colors">
+                  <X size={14} />
+                </button>
+              </div>
             </div>
                     </div>
                 ))}
@@ -696,15 +719,16 @@ const TeamManager = () => {
     role: '',
     bio: '',
     isFounder: false,
+    image_url: '',
   });
 
   const resetForm = () => {
-    setFormData({ name: '', role: '', bio: '', isFounder: false });
+    setFormData({ name: '', role: '', bio: '', isFounder: false, image_url: '' });
     setIsAdding(false);
     setEditingId(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name?.trim() || !formData.role?.trim() || !formData.bio?.trim()) return;
     
     const newMember: TeamMember = {
@@ -713,12 +737,13 @@ const TeamManager = () => {
       role: formData.role,
       bio: formData.bio,
       isFounder: formData.isFounder || false,
+      image_url: formData.image_url || undefined,
     };
 
     if (editingId) {
-      updateTeamMember(editingId, newMember);
+      await updateTeamMember(editingId, newMember);
     } else {
-      addTeamMember(newMember);
+      await addTeamMember(newMember);
     }
     resetForm();
   };
@@ -729,6 +754,7 @@ const TeamManager = () => {
       role: member.role,
       bio: member.bio,
       isFounder: member.isFounder || false,
+      image_url: member.image_url || '',
     });
     setEditingId(member.id);
     setIsAdding(true);
@@ -770,6 +796,12 @@ const TeamManager = () => {
               placeholder="Biografía"
               value={formData.bio}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+            />
+            <ImageUpload
+              currentImage={formData.image_url}
+              onImageChange={(url) => setFormData({ ...formData, image_url: url })}
+              folder="team"
+              label="Foto del Miembro"
             />
             <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
               <input 

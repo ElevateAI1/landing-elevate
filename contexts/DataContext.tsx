@@ -84,7 +84,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .order('created_at', { ascending: false });
       
       if (blogsData && blogsData.length > 0) {
-        setBlogs(blogsData.map(b => ({
+        setBlogs(blogsData.map((b: any) => ({
           id: b.id,
           title: b.title,
           excerpt: b.excerpt,
@@ -103,7 +103,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .order('display_order', { ascending: true });
       
       if (partnersData && partnersData.length > 0) {
-        setPartners(partnersData.map(p => ({
+        setPartners(partnersData.map((p: any) => ({
           id: p.id,
           name: p.name,
           logo_url: p.logo_url
@@ -117,7 +117,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .order('display_order', { ascending: true });
       
       if (testimonialsData && testimonialsData.length > 0) {
-        setTestimonials(testimonialsData.map(t => ({
+        setTestimonials(testimonialsData.map((t: any) => ({
           id: t.id,
           quote: t.quote,
           author: t.author,
@@ -134,7 +134,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .order('display_order', { ascending: true });
       
       if (industriesData && industriesData.length > 0) {
-        setIndustries(industriesData.map(i => i.name));
+        setIndustries(industriesData.map((i: any) => i.name));
       }
 
       // Cargar team members
@@ -144,7 +144,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .order('display_order', { ascending: true });
       
       if (teamData && teamData.length > 0) {
-        setTeamMembers(teamData.map(t => ({
+        setTeamMembers(teamData.map((t: any) => ({
           id: t.id,
           name: t.name,
           role: t.role,

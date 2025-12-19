@@ -485,7 +485,7 @@ const PartnerManager = () => {
                   <Edit size={14} />
                 </button>
                 <button onClick={() => deletePartner(p.id)} className="text-red-900 hover:text-red-500 transition-colors">
-                  <X size={14} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>

@@ -1,2 +1,71 @@
 /* Estilos adicionales para Elevate AI Landing Page */
 
+/* Animación para líneas de constelación */
+.constellation-line {
+  animation: dash 2s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+/* Estilos para modal de partners */
+.partner-modal {
+  background: rgba(10, 10, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 280px;
+  box-shadow: 0 8px 32px rgba(0, 240, 255, 0.2);
+  pointer-events: none;
+}
+
+.partner-modal .modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.partner-modal .modal-description {
+  color: rgba(209, 213, 219, 1);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.partner-modal .modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.partner-modal .tag {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 4px;
+  color: rgb(34, 211, 238);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Optimización de performance */
+.partner-modal,
+.constellation-line {
+  will-change: transform, opacity;
+}
+
+/* Responsive: reducir partículas en mobile */
+@media (max-width: 768px) {
+  .partner-modal {
+    max-width: 240px;
+    padding: 16px;
+    font-size: 0.875rem;
+  }
+}
+

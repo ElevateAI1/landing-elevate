@@ -192,7 +192,7 @@ const IntelligenceNarrative: React.FC = () => {
                                 <h2 className="font-display text-3xl md:text-4xl text-white mb-6">
                                     {selectedPost.title}
                                 </h2>
-                                <div className="font-mono text-gray-400 text-sm leading-relaxed space-y-4">
+                                <div className="font-mono text-gray-400 text-sm leading-relaxed space-y-4 mb-8">
                                     <p className="first-letter:text-3xl first-letter:text-emerald-500 first-letter:float-left first-letter:mr-2 font-bold">{selectedPost.excerpt}</p>
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
                                     <div className="p-4 bg-emerald-900/10 border-l-2 border-emerald-500 my-8 italic text-emerald-200/80">
@@ -202,10 +202,31 @@ const IntelligenceNarrative: React.FC = () => {
                                 </div>
 
                                 <div className="flex gap-4 mt-8">
-                                    <button className="flex-1 bg-white text-black font-display font-bold py-3 hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2 group">
-                                        <Eye size={16} className="group-hover:animate-pulse" /> READ FULL LOG
+                                    <button 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            window.location.href = `/blog/${selectedPost.slug}`;
+                                        }}
+                                        className="flex-1 bg-white text-black font-display font-bold py-3 hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2 group"
+                                    >
+                                        <Eye size={16} className="group-hover:animate-pulse" /> VER BLOG COMPLETO
                                     </button>
-                                    <button className="px-6 border border-white/20 hover:border-white transition-colors">
+                                    <button 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (navigator.share) {
+                                                navigator.share({
+                                                    title: selectedPost.title,
+                                                    text: selectedPost.excerpt,
+                                                    url: window.location.origin + `/blog/${selectedPost.slug}`
+                                                });
+                                            } else {
+                                                navigator.clipboard.writeText(window.location.origin + `/blog/${selectedPost.slug}`);
+                                                alert('URL copiada al portapapeles');
+                                            }
+                                        }}
+                                        className="px-6 border border-white/20 hover:border-white transition-colors"
+                                    >
                                         <Share2 size={16} className="text-white" />
                                     </button>
                                 </div>

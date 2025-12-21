@@ -27,6 +27,7 @@ import ProductsNarrative from './components/pages/ProductsNarrative';
 import IntelligenceNarrative from './components/pages/IntelligenceNarrative';
 import NetworkNarrative from './components/pages/NetworkNarrative';
 import AboutUsNarrative from './components/pages/AboutUsNarrative';
+import BlogPostPage from './components/pages/BlogPostPage';
 import AdminDashboard from './components/admin/AdminDashboard';
 
 // --- Transition Effects ---
@@ -109,11 +110,23 @@ const HomeView = () => {
 
 const MainContent: React.FC = () => {
   const [view, setView] = useState<ViewState>('home');
+  const [blogSlug, setBlogSlug] = useState<string | null>(null);
   
   // Basic routing check on mount and on popstate
   useEffect(() => {
     const updateView = () => {
       const path = window.location.pathname;
+      
+      // Check for blog post routes (/blog/[slug])
+      const blogMatch = path.match(/^\/blog\/(.+)$/);
+      if (blogMatch) {
+        setBlogSlug(blogMatch[1]);
+        setView('home'); // Use 'home' as placeholder, we'll handle blog separately
+        return;
+      }
+      
+      setBlogSlug(null);
+      
       if (path === '/admin') {
         setView('admin');
       } else if (path === '/about-us') {
@@ -135,6 +148,12 @@ const MainContent: React.FC = () => {
     window.addEventListener('popstate', updateView);
     return () => window.removeEventListener('popstate', updateView);
   }, []);
+  
+  const handleBackFromBlog = () => {
+    window.history.pushState({}, '', '/intelligence');
+    setBlogSlug(null);
+    setView('intelligence');
+  };
 
   return (
     <div className="bg-neutral-950 min-h-screen text-neutral-50 selection:bg-emerald-500 selection:text-white overflow-x-hidden perspective-[2000px]">
@@ -143,8 +162,8 @@ const MainContent: React.FC = () => {
       
       <CustomCursor />
       
-      {/* Hide Navigation on Admin Page */}
-      {view !== 'admin' && <Navigation currentView={view} onChangeView={setView} />}
+      {/* Hide Navigation on Admin Page and Blog Posts */}
+      {view !== 'admin' && !blogSlug && <Navigation currentView={view} onChangeView={setView} />}
       
       {/* Audio Player - Available on all pages */}
       <AudioPlayer />
@@ -156,44 +175,51 @@ const MainContent: React.FC = () => {
       <main className="relative z-10 w-full min-h-screen transform-style-3d overflow-hidden">
         <AnimatePresence mode="wait">
             
+            {/* BLOG POST PAGE */}
+            {blogSlug && (
+                <PageTransition view="home">
+                    <BlogPostPage slug={blogSlug} onBack={handleBackFromBlog} />
+                </PageTransition>
+            )}
+            
             {/* ORIGINAL HOME */}
-            {view === 'home' && (
+            {!blogSlug && view === 'home' && (
                 <PageTransition view="home">
                     <HomeView />
                 </PageTransition>
             )}
 
             {/* NEW NARRATIVE PAGES */}
-            {view === 'products' && (
+            {!blogSlug && view === 'products' && (
                 <PageTransition view="products">
                     <ProductsNarrative />
                 </PageTransition>
             )}
-            {view === 'intelligence' && (
+            {!blogSlug && view === 'intelligence' && (
                 <PageTransition view="intelligence">
                     <IntelligenceNarrative />
                 </PageTransition>
             )}
-            {view === 'network' && (
+            {!blogSlug && view === 'network' && (
                 <PageTransition view="network">
                     <NetworkNarrative />
                 </PageTransition>
             )}
-            {view === 'about-us' && (
+            {!blogSlug && view === 'about-us' && (
                 <PageTransition view="about-us">
                     <AboutUsNarrative />
                 </PageTransition>
             )}
 
             {/* SHARED PAGES */}
-            {view === 'contact' && (
+            {!blogSlug && view === 'contact' && (
                 <PageTransition view="contact">
                     <div className="pt-20"><Contact /></div>
                 </PageTransition>
             )}
 
             {/* ADMIN PANEL */}
-            {view === 'admin' && (
+            {!blogSlug && view === 'admin' && (
                 <motion.div key="admin" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}>
                     <AdminDashboard />
                 </motion.div>

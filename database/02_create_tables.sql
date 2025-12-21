@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS products (
     calendly_url VARCHAR(500),
     media_url VARCHAR(500),
     media_type VARCHAR(20) CHECK (media_type IS NULL OR media_type IN ('image', 'video')),
+    icon_name VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     display_order INTEGER DEFAULT 0

@@ -7,6 +7,7 @@
 -- - calendly_url: URL de Calendly para reservas
 -- - media_url: URL de imagen o video para timeline
 -- - media_type: tipo de media (image o video)
+-- - icon_name: nombre del icono de lucide-react
 -- ============================================
 
 -- Agregar columna type si no existe
@@ -111,6 +112,20 @@ BEGIN
     END IF;
 END $$;
 
+-- Agregar columna icon_name si no existe
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'products' AND column_name = 'icon_name'
+    ) THEN
+        ALTER TABLE products ADD COLUMN icon_name VARCHAR(100);
+        RAISE NOTICE 'Columna "icon_name" agregada a products';
+    ELSE
+        RAISE NOTICE 'Columna "icon_name" ya existe en products';
+    END IF;
+END $$;
+
 -- Crear índices para mejorar performance
 CREATE INDEX IF NOT EXISTS idx_products_type ON products(type);
 CREATE INDEX IF NOT EXISTS idx_products_media_type ON products(media_type);
@@ -131,6 +146,7 @@ BEGIN
     RAISE NOTICE '  - calendly_url';
     RAISE NOTICE '  - media_url';
     RAISE NOTICE '  - media_type (image/video)';
+    RAISE NOTICE '  - icon_name (nombre del icono)';
     RAISE NOTICE '============================================';
 END $$;
 

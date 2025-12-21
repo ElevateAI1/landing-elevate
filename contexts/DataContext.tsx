@@ -103,6 +103,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           calendly_url: p.calendly_url || undefined,
           media_url: p.media_url || undefined,
           media_type: p.media_type || undefined,
+          icon_name: p.icon_name || undefined,
           features: (p.product_features || [])
             .sort((a: any, b: any) => a.display_order - b.display_order)
             .map((f: any) => f.feature_text)
@@ -541,7 +542,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             image_url: item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
             calendly_url: item.calendly_url && item.calendly_url.trim() !== '' ? item.calendly_url : null,
             media_url: item.media_url && item.media_url.trim() !== '' ? item.media_url : null,
-            media_type: item.media_type && item.media_type.trim() !== '' ? item.media_type : null
+            media_type: item.media_type && item.media_type.trim() !== '' ? item.media_type : null,
+            icon_name: item.icon_name && item.icon_name.trim() !== '' ? item.icon_name : null
           })
           .select()
           .single();
@@ -600,7 +602,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               image_url: productToInsert.image_url && productToInsert.image_url.trim() !== '' ? productToInsert.image_url : null,
               calendly_url: productToInsert.calendly_url && productToInsert.calendly_url.trim() !== '' ? productToInsert.calendly_url : null,
               media_url: productToInsert.media_url && productToInsert.media_url.trim() !== '' ? productToInsert.media_url : null,
-              media_type: productToInsert.media_type && productToInsert.media_type.trim() !== '' ? productToInsert.media_type : null
+              media_type: productToInsert.media_type && productToInsert.media_type.trim() !== '' ? productToInsert.media_type : null,
+              icon_name: productToInsert.icon_name && productToInsert.icon_name.trim() !== '' ? productToInsert.icon_name : null
             })
             .select()
             .single();
@@ -640,7 +643,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             image_url: item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
             calendly_url: item.calendly_url && item.calendly_url.trim() !== '' ? item.calendly_url : null,
             media_url: item.media_url && item.media_url.trim() !== '' ? item.media_url : null,
-            media_type: item.media_type && item.media_type.trim() !== '' ? item.media_type : null
+            media_type: item.media_type && item.media_type.trim() !== '' ? item.media_type : null,
+            icon_name: item.icon_name && item.icon_name.trim() !== '' ? item.icon_name : null
           })
           .eq('id', id);
         

@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useData } from '../../contexts/DataContext';
 import { ArrowRight, ShieldAlert, Cpu, Lock } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import WhatsAppFloatButton from '../WhatsAppFloatButton';
 
 // --- 3D Components ---
@@ -224,7 +225,14 @@ const ProductsNarrative: React.FC = () => {
                                             <div className="flex justify-between items-start translate-z-10">
                                                 <div className="font-mono text-xs text-emerald-500 tracking-widest uppercase bg-emerald-900/20 px-2 py-1 rounded">MK-{index + 1} // {product.id.toUpperCase()}</div>
                                                 <div className="text-white/20 group-hover:text-emerald-400 transition-colors transform group-hover:scale-110 duration-300">
-                                                    {index === 0 ? <ShieldAlert size={40} /> : index === 1 ? <Cpu size={40} /> : <Lock size={40} />}
+                                                    {(() => {
+                                                        if (product.icon_name && (LucideIcons as any)[product.icon_name]) {
+                                                            const IconComponent = (LucideIcons as any)[product.icon_name];
+                                                            return React.createElement(IconComponent, { size: 40 });
+                                                        }
+                                                        // Fallback a iconos por defecto
+                                                        return index === 0 ? <ShieldAlert size={40} /> : index === 1 ? <Cpu size={40} /> : <Lock size={40} />;
+                                                    })()}
                                                 </div>
                                             </div>
                                         
@@ -394,7 +402,14 @@ const ProductsNarrative: React.FC = () => {
                           DEV-{index + 1}
                         </div>
                         <div className="text-white/20 group-hover:text-emerald-400 transition-colors transform group-hover:scale-110 duration-300">
-                          <Cpu size={40} />
+                          {(() => {
+                            if (product.icon_name && (LucideIcons as any)[product.icon_name]) {
+                              const IconComponent = (LucideIcons as any)[product.icon_name];
+                              return React.createElement(IconComponent, { size: 40 });
+                            }
+                            // Fallback a Cpu por defecto
+                            return <Cpu size={40} />;
+                          })()}
                         </div>
                       </div>
                     

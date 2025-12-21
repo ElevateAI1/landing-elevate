@@ -10,6 +10,7 @@ export interface Service {
   calendly_url?: string;
   media_url?: string; // Para timeline: imagen o video en el área gráfica
   media_type?: 'image' | 'video'; // Tipo de media para timeline
+  icon_name?: string; // Nombre del icono de lucide-react
 }
 
 export interface Testimonial {

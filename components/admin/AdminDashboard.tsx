@@ -6,6 +6,7 @@ import { Trash2, Plus, Edit, Save, X, Terminal, Users, Box, MessageSquare, Build
 import { Service, BlogPost, Partner, Testimonial, TeamMember } from '../../types';
 import { ImageUpload } from './ImageUpload';
 import { MediaUpload } from './MediaUpload';
+import { IconSelector } from './IconSelector';
 import { generateUUID } from '../../lib/utils';
 
 type AdminTab = 'blogs' | 'partners' | 'products' | 'testimonials' | 'industries' | 'team';
@@ -130,14 +131,15 @@ const ProductManager = () => {
     type: 'timeline',
     calendly_url: '',
     media_url: '',
-    media_type: 'image'
+    media_type: 'image',
+    icon_name: ''
   });
 
   const timelineProducts = products.filter(p => p.type === 'timeline' || !p.type);
   const developmentProducts = products.filter(p => p.type === 'development');
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', price: '', features: [], type: activeSection, calendly_url: '', media_url: '', media_type: 'image' });
+    setFormData({ title: '', description: '', price: '', features: [], type: activeSection, calendly_url: '', media_url: '', media_type: 'image', icon_name: '' });
     setIsAdding(false);
     setEditingId(null);
   };
@@ -154,7 +156,8 @@ const ProductManager = () => {
       type: formData.type || activeSection,
       calendly_url: formData.calendly_url,
       media_url: formData.media_url,
-      media_type: formData.media_type || 'image'
+      media_type: formData.media_type || 'image',
+      icon_name: formData.icon_name
     };
 
     if (editingId) {
@@ -259,6 +262,11 @@ const ProductManager = () => {
                 value={formData.calendly_url || ''}
                 onChange={(e) => setFormData({...formData, calendly_url: e.target.value})}
               />
+              <IconSelector
+                currentIcon={formData.icon_name}
+                onIconChange={(iconName) => setFormData({ ...formData, icon_name: iconName })}
+                label="Icono del Producto"
+              />
               <div className="flex gap-2">
                 <button onClick={handleSave} className="px-4 py-2 bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition-colors">
                   <Save size={16} className="inline mr-2" />
@@ -278,7 +286,7 @@ const ProductManager = () => {
         </h3>
         <button 
           onClick={() => { 
-            setFormData({ title: '', description: '', price: '', features: [], type: activeSection, calendly_url: '', media_url: '', media_type: 'image' });
+            setFormData({ title: '', description: '', price: '', features: [], type: activeSection, calendly_url: '', media_url: '', media_type: 'image', icon_name: '' });
             setIsAdding(true); 
           }} 
           className="flex items-center gap-2 text-emerald-500 hover:text-white transition-colors"

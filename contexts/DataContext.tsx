@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Service, BlogPost, Partner, Testimonial, TeamMember } from '../types';
 import { CONTENT } from '../constants';
 import { supabase } from '../lib/supabase';
+import { generateUUID } from '../lib/utils';
 
 // Initial Data Loading from Constants (Using Spanish content)
 const INITIAL_PRODUCTS = CONTENT.es.services;
@@ -537,10 +538,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             description: item.description,
             price: item.price,
             type: item.type || 'timeline',
-            image_url: item.image_url || null,
-            calendly_url: item.calendly_url || null,
-            media_url: item.media_url || null,
-            media_type: item.media_type || null
+            image_url: item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
+            calendly_url: item.calendly_url && item.calendly_url.trim() !== '' ? item.calendly_url : null,
+            media_url: item.media_url && item.media_url.trim() !== '' ? item.media_url : null,
+            media_type: item.media_type && item.media_type.trim() !== '' ? item.media_type : null
           })
           .select()
           .single();
@@ -568,13 +569,67 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  // Función helper para verificar si un string es un UUID válido
+  const isValidUUID = (str: string): boolean => {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(str);
+  };
+
   const updateProduct = async (id: string, item: Service) => {
     const previousProducts = products;
     const updated = products.map(p => p.id === id ? item : p);
     setProducts(updated);
     if (supabase) {
       try {
-        // Actualizar producto
+        // Si el ID no es un UUID válido, significa que es un producto inicial que aún no está en Supabase
+        // En este caso, lo insertamos como nuevo producto con un UUID generado
+        if (!isValidUUID(id)) {
+          // Generar nuevo UUID para el producto
+          const newId = generateUUID();
+          const productToInsert = { ...item, id: newId };
+          
+          // Insertar producto
+          const { data: productData, error: productError } = await supabase
+            .from('products')
+            .insert({
+              id: newId,
+              title: productToInsert.title,
+              description: productToInsert.description,
+              price: productToInsert.price,
+              type: productToInsert.type || 'timeline',
+              image_url: productToInsert.image_url && productToInsert.image_url.trim() !== '' ? productToInsert.image_url : null,
+              calendly_url: productToInsert.calendly_url && productToInsert.calendly_url.trim() !== '' ? productToInsert.calendly_url : null,
+              media_url: productToInsert.media_url && productToInsert.media_url.trim() !== '' ? productToInsert.media_url : null,
+              media_type: productToInsert.media_type && productToInsert.media_type.trim() !== '' ? productToInsert.media_type : null
+            })
+            .select()
+            .single();
+          
+          if (productError) throw productError;
+
+          // Actualizar el estado local con el nuevo ID
+          const updatedWithNewId = products.map(p => p.id === id ? { ...productToInsert, id: newId } : p);
+          setProducts(updatedWithNewId);
+
+          // Insertar features si existen
+          if (productToInsert.features && productToInsert.features.length > 0 && productData) {
+            const featuresToInsert = productToInsert.features.map((feature, index) => ({
+              product_id: productData.id,
+              feature_text: feature,
+              display_order: index
+            }));
+
+            const { error: featuresError } = await supabase
+              .from('product_features')
+              .insert(featuresToInsert);
+            
+            if (featuresError) throw featuresError;
+          }
+          
+          return;
+        }
+
+        // Si es un UUID válido, actualizar normalmente
         const { error: productError } = await supabase
           .from('products')
           .update({
@@ -582,10 +637,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             description: item.description,
             price: item.price,
             type: item.type || 'timeline',
-            image_url: item.image_url || null,
-            calendly_url: item.calendly_url || null,
-            media_url: item.media_url || null,
-            media_type: item.media_type || null
+            image_url: item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
+            calendly_url: item.calendly_url && item.calendly_url.trim() !== '' ? item.calendly_url : null,
+            media_url: item.media_url && item.media_url.trim() !== '' ? item.media_url : null,
+            media_type: item.media_type && item.media_type.trim() !== '' ? item.media_type : null
           })
           .eq('id', id);
         

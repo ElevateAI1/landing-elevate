@@ -795,17 +795,17 @@ const TeamManager = () => {
             <div className="relative">
               <textarea 
                 className="w-full bg-transparent border-b border-gray-700 p-2 text-white focus:border-emerald-500 outline-none min-h-[80px]"
-                placeholder="Biografía (máximo 350 caracteres)"
+                placeholder="Biografía (máximo 500 caracteres)"
                 value={formData.bio}
-                maxLength={350}
+                maxLength={500}
                 onChange={(e) => {
-                  if (e.target.value.length <= 350) {
+                  if (e.target.value.length <= 500) {
                     setFormData({ ...formData, bio: e.target.value });
                   }
                 }}
               />
               <div className="text-right text-xs text-gray-500 mt-1">
-                {formData.bio?.length || 0} / 350 caracteres
+                {formData.bio?.length || 0} / 500 caracteres
               </div>
             </div>
             <ImageUpload

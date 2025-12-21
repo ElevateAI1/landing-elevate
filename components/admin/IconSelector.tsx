@@ -45,14 +45,11 @@ export const IconSelector: React.FC<IconSelectorProps> = ({
             className="w-full bg-transparent border border-gray-700 p-2 text-white focus:border-emerald-500 outline-none"
           >
             <option value="">Seleccionar icono</option>
-            {AVAILABLE_ICONS.map((iconName) => {
-              const Icon = (LucideIcons as any)[iconName];
-              return (
-                <option key={iconName} value={iconName}>
-                  {iconName}
-                </option>
-              );
-            })}
+            {AVAILABLE_ICONS.map((iconName) => (
+              <option key={iconName} value={iconName}>
+                {iconName}
+              </option>
+            ))}
           </select>
           <p className="text-xs text-gray-500 mt-1">Elige un icono de Lucide React</p>
         </div>

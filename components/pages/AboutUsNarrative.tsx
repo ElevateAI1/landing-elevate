@@ -189,7 +189,7 @@ const TeamMemberCard = ({
           <motion.div
             whileHover={{ scale: 1.1, rotate: 360 }}
             transition={{ duration: 0.6 }}
-            className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-full flex items-center justify-center font-mono text-emerald-100 font-bold text-2xl shadow-lg shadow-emerald-500/30 flex-shrink-0 overflow-hidden relative"
+            className="w-20 h-20 mb-6 rounded-full flex items-center justify-center font-mono text-emerald-100 font-bold text-2xl shadow-lg shadow-emerald-500/30 flex-shrink-0 overflow-hidden relative bg-gradient-to-br from-emerald-500 to-emerald-700"
           >
             {member.image_url && member.image_url.trim() !== '' ? (
               <>
@@ -198,16 +198,16 @@ const TeamMemberCard = ({
                   alt={member.name}
                   className="w-full h-full object-cover rounded-full"
                   onError={(e) => {
-                    // Fallback a inicial si la imagen falla al cargar
+                    // Si la imagen falla, ocultar la imagen y mostrar la inicial
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
-                    const fallback = target.nextElementSibling as HTMLElement;
+                    const fallback = target.parentElement?.querySelector('.avatar-fallback') as HTMLElement;
                     if (fallback) {
                       fallback.style.display = 'flex';
                     }
                   }}
                 />
-                <span className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-full" style={{ display: 'none' }}>
+                <span className="avatar-fallback absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-full" style={{ display: 'none' }}>
                   {member.name.charAt(0)}
                 </span>
               </>

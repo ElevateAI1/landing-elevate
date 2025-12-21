@@ -144,7 +144,7 @@ const ProductManager = () => {
     setEditingId(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.description || !formData.price) return;
     
     const newProduct: Service = {
@@ -160,12 +160,17 @@ const ProductManager = () => {
       icon_name: formData.icon_name
     };
 
-    if (editingId) {
-      updateProduct(editingId, newProduct);
-    } else {
-      addProduct(newProduct);
+    try {
+      if (editingId) {
+        await updateProduct(editingId, newProduct);
+      } else {
+        await addProduct(newProduct);
+      }
+      resetForm();
+    } catch (error) {
+      console.error('Error al guardar producto:', error);
+      alert('Error al guardar el producto. Por favor, intenta nuevamente.');
     }
-    resetForm();
   };
 
   const startEdit = (product: Service) => {
@@ -363,12 +368,17 @@ const BlogManager = () => {
       slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, '-')
     };
 
-    if (editingId) {
-      await updateBlog(editingId, newBlog);
-    } else {
-      await addBlog(newBlog);
+    try {
+      if (editingId) {
+        await updateBlog(editingId, newBlog);
+      } else {
+        await addBlog(newBlog);
+      }
+      resetForm();
+    } catch (error) {
+      console.error('Error al guardar blog:', error);
+      alert('Error al guardar el blog. Por favor, intenta nuevamente.');
     }
-    resetForm();
   };
 
   const startEdit = (blog: BlogPost) => {
@@ -496,15 +506,20 @@ const PartnerManager = () => {
       logo_url: logoUrl || undefined
     };
     
-    if (editingId) {
-      await updatePartner(editingId, partnerData);
-    } else {
-      await addPartner(partnerData);
+    try {
+      if (editingId) {
+        await updatePartner(editingId, partnerData);
+      } else {
+        await addPartner(partnerData);
+      }
+      setPartnerName('');
+      setLogoUrl('');
+      setIsAdding(false);
+      setEditingId(null);
+    } catch (error) {
+      console.error('Error al guardar socio:', error);
+      alert('Error al guardar el socio. Por favor, intenta nuevamente.');
     }
-    setPartnerName('');
-    setLogoUrl('');
-    setIsAdding(false);
-    setEditingId(null);
   };
 
   const startEdit = (partner: Partner) => {
@@ -602,7 +617,7 @@ const TestimonialManager = () => {
     setEditingId(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.quote || !formData.author) return;
     
     const newTestimonial: Testimonial = {
@@ -614,12 +629,17 @@ const TestimonialManager = () => {
       industry: formData.industry || ''
     };
 
-    if (editingId) {
-      updateTestimonial(editingId, newTestimonial);
-    } else {
-      addTestimonial(newTestimonial);
+    try {
+      if (editingId) {
+        await updateTestimonial(editingId, newTestimonial);
+      } else {
+        await addTestimonial(newTestimonial);
+      }
+      resetForm();
+    } catch (error) {
+      console.error('Error al guardar testimonio:', error);
+      alert('Error al guardar el testimonio. Por favor, intenta nuevamente.');
     }
-    resetForm();
   };
 
   const startEdit = (testimonial: Testimonial) => {
@@ -722,17 +742,22 @@ const IndustryManager = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [industryName, setIndustryName] = useState('');
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!industryName.trim()) return;
     
-    if (editingIndex !== null) {
-      updateIndustry(editingIndex, industryName);
-    } else {
-      addIndustry(industryName);
+    try {
+      if (editingIndex !== null) {
+        await updateIndustry(editingIndex, industryName);
+      } else {
+        await addIndustry(industryName);
+      }
+      setIndustryName('');
+      setIsAdding(false);
+      setEditingIndex(null);
+    } catch (error) {
+      console.error('Error al guardar industria:', error);
+      alert('Error al guardar la industria. Por favor, intenta nuevamente.');
     }
-    setIndustryName('');
-    setIsAdding(false);
-    setEditingIndex(null);
   };
 
   const startEdit = (index: number) => {
@@ -828,12 +853,17 @@ const TeamManager = () => {
       image_url: formData.image_url || undefined,
     };
 
-    if (editingId) {
-      await updateTeamMember(editingId, newMember);
-    } else {
-      await addTeamMember(newMember);
+    try {
+      if (editingId) {
+        await updateTeamMember(editingId, newMember);
+      } else {
+        await addTeamMember(newMember);
+      }
+      resetForm();
+    } catch (error) {
+      console.error('Error al guardar miembro del equipo:', error);
+      alert('Error al guardar el miembro del equipo. Por favor, intenta nuevamente.');
     }
-    resetForm();
   };
 
   const startEdit = (member: TeamMember) => {

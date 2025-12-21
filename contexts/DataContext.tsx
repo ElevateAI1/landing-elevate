@@ -219,6 +219,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error adding blog:', error);
         setBlogs(previousBlogs);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -245,6 +246,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error updating blog:', error);
         setBlogs(previousBlogs);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -284,6 +286,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error adding partner:', error);
         setPartners(previousPartners);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -305,6 +308,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error updating partner:', error);
         setPartners(previousPartners);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -347,6 +351,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error adding testimonial:', error);
         setTestimonials(previousTestimonials);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -371,6 +376,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error updating testimonial:', error);
         setTestimonials(previousTestimonials);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -406,6 +412,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error adding industry:', error);
         setIndustries(previousIndustries);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -435,6 +442,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error updating industry:', error);
         setIndustries(previousIndustries);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -478,6 +486,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error adding team member:', error);
         setTeamMembers(previousTeamMembers);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -502,6 +511,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('Error updating team member:', error);
         setTeamMembers(previousTeamMembers);
+        throw error; // Re-lanzar el error
       }
     }
   };
@@ -530,6 +540,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setProducts([...products, item]);
     if (supabase) {
       try {
+        // Asegurar que el type esté definido
+        const productType = item.type || 'timeline';
+        console.log('Guardando producto:', { id: item.id, title: item.title, type: productType });
+        
         // Insertar producto
         const { data: productData, error: productError } = await supabase
           .from('products')
@@ -538,7 +552,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             title: item.title,
             description: item.description,
             price: item.price,
-            type: item.type || 'timeline',
+            type: productType,
             image_url: item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
             calendly_url: item.calendly_url && item.calendly_url.trim() !== '' ? item.calendly_url : null,
             media_url: item.media_url && item.media_url.trim() !== '' ? item.media_url : null,
@@ -548,7 +562,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .select()
           .single();
         
-        if (productError) throw productError;
+        if (productError) {
+          console.error('Error al insertar producto en Supabase:', productError);
+          throw productError;
+        }
+
+        console.log('Producto guardado exitosamente:', productData);
 
         // Insertar features si existen
         if (item.features && item.features.length > 0 && productData) {
@@ -562,11 +581,15 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             .from('product_features')
             .insert(featuresToInsert);
           
-          if (featuresError) throw featuresError;
+          if (featuresError) {
+            console.error('Error al insertar features:', featuresError);
+            throw featuresError;
+          }
         }
       } catch (error) {
         console.error('Error adding product:', error);
         setProducts(previousProducts);
+        throw error; // Re-lanzar el error para que handleSave pueda manejarlo
       }
     }
   };

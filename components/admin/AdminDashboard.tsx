@@ -260,15 +260,13 @@ const ProductManager = () => {
                 value={formData.calendly_url || ''}
                 onChange={(e) => setFormData({...formData, calendly_url: e.target.value})}
               />
-              {activeSection === 'timeline' && (
-                <MediaUpload
-                  currentMedia={formData.media_url}
-                  currentMediaType={formData.media_type}
-                  onMediaChange={(url, type) => setFormData({ ...formData, media_url: url, media_type: type })}
-                  folder="products"
-                  label="Media del Área Gráfica (Imagen o Video)"
-                />
-              )}
+              <MediaUpload
+                currentMedia={formData.media_url}
+                currentMediaType={formData.media_type}
+                onMediaChange={(url, type) => setFormData({ ...formData, media_url: url, media_type: type })}
+                folder="products"
+                label="Media del Área Gráfica (Imagen o Video)"
+              />
               <div className="flex gap-2">
                 <button onClick={handleSave} className="px-4 py-2 bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition-colors">
                   <Save size={16} className="inline mr-2" />

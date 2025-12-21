@@ -349,8 +349,38 @@ const ProductsNarrative: React.FC = () => {
                 <TiltCard key={product.id} index={index}>
                   <div className="w-full aspect-square bg-[#0a0a0a] border border-white/10 relative overflow-hidden flex flex-col justify-between group transition-colors duration-500 shadow-[0_0_30px_rgba(0,0,0,0.5)] transform-style-3d hover:border-emerald-500/50">
                     
-                    {/* Product Image or Default Background */}
-                    {product.image_url ? (
+                    {/* Media Area (Image or Video) - Para desarrollos también */}
+                    {product.media_url ? (
+                      <div className="absolute inset-0">
+                        {product.media_type === 'video' ? (
+                          getVideoEmbedUrl(product.media_url) ? (
+                            <iframe
+                              src={getVideoEmbedUrl(product.media_url) || ''}
+                              className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                              allow="autoplay; encrypted-media"
+                              allowFullScreen
+                              style={{ border: 'none' }}
+                            />
+                          ) : (
+                            <video
+                              src={product.media_url}
+                              className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                            />
+                          )
+                        ) : (
+                          <img 
+                            src={product.media_url} 
+                            alt={product.title}
+                            className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a]/80 to-[#0a0a0a]/40" />
+                      </div>
+                    ) : product.image_url ? (
                       <div className="absolute inset-0">
                         <img 
                           src={product.image_url} 

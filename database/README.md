@@ -40,12 +40,32 @@ Inserta datos iniciales:
 - Usuario administrador (requiere hash de contraseña)
 - Datos de ejemplo (opcional, comentados)
 
+### 5. `05_create_storage_policies.sql`
+Configura políticas de Storage para Supabase (imágenes, videos, etc.)
+
+### 6. `06_migrate_products_table.sql` ⚠️ NUEVO
+**Script de migración para agregar nuevos campos a la tabla products:**
+- `type` - Tipo de producto (timeline/development)
+- `image_url` - URL de imagen del producto
+- `calendly_url` - URL de Calendly para reservas
+- `media_url` - URL de imagen o video para área gráfica de timeline
+- `media_type` - Tipo de media (image/video)
+
+**Ejecuta este script si ya tienes la base de datos creada y necesitas agregar los nuevos campos.**
+
 ## 🚀 Orden de Ejecución
 
+### Para una instalación nueva:
 1. **Primero**: Ejecuta `01_drop_database.sql` (solo si necesitas resetear)
 2. **Segundo**: Ejecuta `02_create_tables.sql`
 3. **Tercero**: Ejecuta `03_create_policies.sql`
 4. **Cuarto**: Ejecuta `04_insert_initial_data.sql` (ajusta la contraseña antes)
+5. **Quinto**: Ejecuta `05_create_storage_policies.sql`
+6. **Sexto**: Ejecuta `06_migrate_products_table.sql` (agrega campos nuevos)
+
+### Para una base de datos existente:
+Si ya tienes la base de datos creada, solo necesitas ejecutar:
+- `06_migrate_products_table.sql` - Para agregar los nuevos campos a products
 
 ## 🔐 Configuración de Contraseña
 

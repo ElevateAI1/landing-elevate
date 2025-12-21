@@ -32,6 +32,11 @@ CREATE TABLE IF NOT EXISTS products (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     price VARCHAR(100) NOT NULL,
+    type VARCHAR(20) DEFAULT 'timeline' CHECK (type IS NULL OR type IN ('timeline', 'development')),
+    image_url VARCHAR(500),
+    calendly_url VARCHAR(500),
+    media_url VARCHAR(500),
+    media_type VARCHAR(20) CHECK (media_type IS NULL OR media_type IN ('image', 'video')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     display_order INTEGER DEFAULT 0
@@ -49,6 +54,8 @@ CREATE TABLE IF NOT EXISTS product_features (
 -- Índices para products
 CREATE INDEX IF NOT EXISTS idx_products_title ON products(title);
 CREATE INDEX IF NOT EXISTS idx_products_display_order ON products(display_order);
+CREATE INDEX IF NOT EXISTS idx_products_type ON products(type);
+CREATE INDEX IF NOT EXISTS idx_products_media_type ON products(media_type);
 CREATE INDEX IF NOT EXISTS idx_product_features_product_id ON product_features(product_id);
 
 -- ============================================
@@ -166,24 +173,31 @@ END;
 $$ language 'plpgsql';
 
 -- Triggers para actualizar updated_at
+DROP TRIGGER IF EXISTS update_products_updated_at ON products;
 CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_blog_posts_updated_at ON blog_posts;
 CREATE TRIGGER update_blog_posts_updated_at BEFORE UPDATE ON blog_posts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_partners_updated_at ON partners;
 CREATE TRIGGER update_partners_updated_at BEFORE UPDATE ON partners
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_testimonials_updated_at ON testimonials;
 CREATE TRIGGER update_testimonials_updated_at BEFORE UPDATE ON testimonials
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_industries_updated_at ON industries;
 CREATE TRIGGER update_industries_updated_at BEFORE UPDATE ON industries
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_team_members_updated_at ON team_members;
 CREATE TRIGGER update_team_members_updated_at BEFORE UPDATE ON team_members
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_admin_users_updated_at ON admin_users;
 CREATE TRIGGER update_admin_users_updated_at BEFORE UPDATE ON admin_users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

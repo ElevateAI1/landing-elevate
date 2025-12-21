@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useData } from '../../contexts/DataContext';
 import { ArrowRight, ShieldAlert, Cpu, Lock } from 'lucide-react';
+import WhatsAppFloatButton from '../WhatsAppFloatButton';
 
 // --- 3D Components ---
 
@@ -85,6 +86,32 @@ const TiltCard: React.FC<TiltCardProps> = ({ children, index }) => {
   );
 };
 
+// Helper para convertir URLs de YouTube/Vimeo a formato embed
+const getVideoEmbedUrl = (url: string): string | null => {
+  if (!url) return null;
+  
+  // YouTube
+  const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const youtubeMatch = url.match(youtubeRegex);
+  if (youtubeMatch) {
+    return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1&loop=1&mute=1&playlist=${youtubeMatch[1]}&controls=0&modestbranding=1`;
+  }
+  
+  // Vimeo
+  const vimeoRegex = /(?:vimeo\.com\/)(\d+)/;
+  const vimeoMatch = url.match(vimeoRegex);
+  if (vimeoMatch) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1&loop=1&muted=1&controls=0`;
+  }
+  
+  // Si es una URL directa de video, devolverla tal cual
+  if (url.match(/\.(mp4|webm|ogg|mov)$/i)) {
+    return url;
+  }
+  
+  return null;
+};
+
 const ProductsNarrative: React.FC = () => {
   const { products } = useData();
   const { scrollY } = useScroll();
@@ -152,37 +179,82 @@ const ProductsNarrative: React.FC = () => {
                             {/* Graphic Side */}
                             <div className="w-full md:w-1/2 flex justify-center relative perspective-[1000px] z-10">
                                 <TiltCard index={index}>
-                                    <div className="w-full max-w-md aspect-square bg-[#0a0a0a] border border-white/10 relative overflow-hidden p-8 flex flex-col justify-between group transition-colors duration-500 shadow-[0_0_30px_rgba(0,0,0,0.5)] transform-style-3d">
+                                    <div className="w-full max-w-md aspect-square bg-[#0a0a0a] border border-white/10 relative overflow-hidden flex flex-col justify-between group transition-colors duration-500 shadow-[0_0_30px_rgba(0,0,0,0.5)] transform-style-3d">
                                         
-                                        {/* Holographic Grid on Card */}
-                                        <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20" />
-                                        
-                                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                        
-                                        <div className="flex justify-between items-start translate-z-10">
-                                            <div className="font-mono text-xs text-emerald-500 tracking-widest uppercase bg-emerald-900/20 px-2 py-1 rounded">MK-{index + 1} // {product.id.toUpperCase()}</div>
-                                            <div className="text-white/20 group-hover:text-emerald-400 transition-colors transform group-hover:scale-110 duration-300">
-                                                {index === 0 ? <ShieldAlert size={40} /> : index === 1 ? <Cpu size={40} /> : <Lock size={40} />}
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="space-y-3 translate-z-20">
-                                            {product.features.slice(0, 3).map((_f, i) => (
-                                                <div key={i} className="group/bar">
-                                                    <div className="flex justify-between text-[10px] text-gray-500 font-mono mb-1">
-                                                        <span>PARAM_{i}</span>
-                                                        <span>{(Math.random() * 100).toFixed(0)}%</span>
-                                                    </div>
-                                                    <div className="h-1 bg-gray-800 rounded overflow-hidden">
-                                                        <motion.div 
-                                                            initial={{ width: 0 }}
-                                                            whileInView={{ width: `${Math.random() * 60 + 40}%` }}
-                                                            transition={{ duration: 1.5, delay: 0.5 + (i * 0.2) }}
-                                                            className="h-full bg-emerald-500 group-hover/bar:bg-white transition-colors" 
+                                        {/* Media Area (Image or Video) - Solo para timeline */}
+                                        {product.media_url && product.type === 'timeline' ? (
+                                            <div className="absolute inset-0">
+                                                {product.media_type === 'video' ? (
+                                                    getVideoEmbedUrl(product.media_url) ? (
+                                                        <iframe
+                                                            src={getVideoEmbedUrl(product.media_url) || ''}
+                                                            className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                                                            allow="autoplay; encrypted-media"
+                                                            allowFullScreen
+                                                            style={{ border: 'none' }}
                                                         />
-                                                    </div>
+                                                    ) : (
+                                                        <video
+                                                            src={product.media_url}
+                                                            className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                                                            autoPlay
+                                                            loop
+                                                            muted
+                                                            playsInline
+                                                        />
+                                                    )
+                                                ) : (
+                                                    <img 
+                                                        src={product.media_url} 
+                                                        alt={product.title}
+                                                        className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                                                    />
+                                                )}
+                                                <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a]/80 to-[#0a0a0a]/40" />
+                                            </div>
+                                        ) : product.image_url ? (
+                                            <div className="absolute inset-0">
+                                                <img 
+                                                    src={product.image_url} 
+                                                    alt={product.title}
+                                                    className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a]/80 to-[#0a0a0a]/40" />
+                                            </div>
+                                        ) : (
+                                            <>
+                                                {/* Holographic Grid on Card */}
+                                                <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20" />
+                                                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                            </>
+                                        )}
+                                        
+                                        <div className="relative z-10 p-8 flex flex-col justify-between h-full">
+                                            <div className="flex justify-between items-start translate-z-10">
+                                                <div className="font-mono text-xs text-emerald-500 tracking-widest uppercase bg-emerald-900/20 px-2 py-1 rounded">MK-{index + 1} // {product.id.toUpperCase()}</div>
+                                                <div className="text-white/20 group-hover:text-emerald-400 transition-colors transform group-hover:scale-110 duration-300">
+                                                    {index === 0 ? <ShieldAlert size={40} /> : index === 1 ? <Cpu size={40} /> : <Lock size={40} />}
                                                 </div>
-                                            ))}
+                                            </div>
+                                        
+                                            <div className="space-y-3 translate-z-20">
+                                                {product.features.slice(0, 3).map((_f, i) => (
+                                                    <div key={i} className="group/bar">
+                                                        <div className="flex justify-between text-[10px] text-gray-500 font-mono mb-1">
+                                                            <span>PARAM_{i}</span>
+                                                            <span>{(Math.random() * 100).toFixed(0)}%</span>
+                                                        </div>
+                                                        <div className="h-1 bg-gray-800 rounded overflow-hidden">
+                                                            <motion.div 
+                                                                initial={{ width: 0 }}
+                                                                whileInView={{ width: `${Math.random() * 60 + 40}%` }}
+                                                                transition={{ duration: 1.5, delay: 0.5 + (i * 0.2) }}
+                                                                className="h-full bg-emerald-500 group-hover/bar:bg-white transition-colors" 
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                     {/* Shadow */}
@@ -205,8 +277,14 @@ const ProductsNarrative: React.FC = () => {
                                 <p className="text-gray-400 font-mono text-sm leading-relaxed mb-8 border-l border-white/10 pl-4">
                                     {product.description}
                                 </p>
-                                <button className="group flex items-center gap-4 text-white hover:text-emerald-500 transition-colors font-bold tracking-widest uppercase text-sm border border-white/20 px-6 py-3 hover:bg-emerald-900/20 hover:border-emerald-500/50">
-                                    Initialize Deployment <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform"/>
+                                <button 
+                                    onClick={() => {
+                                        const url = product.calendly_url || 'https://calendly.com'; // TODO: Configurar link por defecto
+                                        window.open(url, '_blank');
+                                    }}
+                                    className="group flex items-center gap-4 text-white hover:text-emerald-500 transition-colors font-bold tracking-widest uppercase text-sm border border-white/20 px-6 py-3 hover:bg-emerald-900/20 hover:border-emerald-500/50"
+                                >
+                                    Reservar Consulta <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform"/>
                                 </button>
                             </motion.div>
 
@@ -269,21 +347,35 @@ const ProductsNarrative: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {developmentProducts.map((product, index) => (
                 <TiltCard key={product.id} index={index}>
-                  <div className="w-full aspect-square bg-[#0a0a0a] border border-white/10 relative overflow-hidden p-8 flex flex-col justify-between group transition-colors duration-500 shadow-[0_0_30px_rgba(0,0,0,0.5)] transform-style-3d hover:border-emerald-500/50">
+                  <div className="w-full aspect-square bg-[#0a0a0a] border border-white/10 relative overflow-hidden flex flex-col justify-between group transition-colors duration-500 shadow-[0_0_30px_rgba(0,0,0,0.5)] transform-style-3d hover:border-emerald-500/50">
                     
-                    {/* Holographic Grid on Card */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20" />
-                    
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
-                    <div className="flex justify-between items-start translate-z-10">
-                      <div className="font-mono text-xs text-emerald-500 tracking-widest uppercase bg-emerald-900/20 px-2 py-1 rounded">
-                        DEV-{index + 1}
+                    {/* Product Image or Default Background */}
+                    {product.image_url ? (
+                      <div className="absolute inset-0">
+                        <img 
+                          src={product.image_url} 
+                          alt={product.title}
+                          className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a]/80 to-[#0a0a0a]/40" />
                       </div>
-                      <div className="text-white/20 group-hover:text-emerald-400 transition-colors transform group-hover:scale-110 duration-300">
-                        <Cpu size={40} />
+                    ) : (
+                      <>
+                        {/* Holographic Grid on Card */}
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      </>
+                    )}
+                    
+                    <div className="relative z-10 p-8 flex flex-col justify-between h-full">
+                      <div className="flex justify-between items-start translate-z-10">
+                        <div className="font-mono text-xs text-emerald-500 tracking-widest uppercase bg-emerald-900/20 px-2 py-1 rounded">
+                          DEV-{index + 1}
+                        </div>
+                        <div className="text-white/20 group-hover:text-emerald-400 transition-colors transform group-hover:scale-110 duration-300">
+                          <Cpu size={40} />
+                        </div>
                       </div>
-                    </div>
                     
                     <div className="space-y-4 translate-z-20">
                       <div>
@@ -317,9 +409,16 @@ const ProductsNarrative: React.FC = () => {
                         ))}
                       </div>
                       
-                      <button className="group flex items-center gap-2 text-white hover:text-emerald-500 transition-colors font-bold tracking-widest uppercase text-xs border border-white/20 px-4 py-2 hover:bg-emerald-900/20 hover:border-emerald-500/50 mt-4">
-                        Ver Detalles <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform"/>
+                      <button 
+                        onClick={() => {
+                          const url = product.calendly_url || 'https://calendly.com'; // TODO: Configurar link por defecto
+                          window.open(url, '_blank');
+                        }}
+                        className="group flex items-center gap-2 text-white hover:text-emerald-500 transition-colors font-bold tracking-widest uppercase text-xs border border-white/20 px-4 py-2 hover:bg-emerald-900/20 hover:border-emerald-500/50 mt-4"
+                      >
+                        Reservar Consulta <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform"/>
                       </button>
+                    </div>
                     </div>
                   </div>
                   {/* Shadow */}
@@ -331,6 +430,9 @@ const ProductsNarrative: React.FC = () => {
         )}
 
       </div>
+      
+      {/* WhatsApp Float Button */}
+      <WhatsAppFloatButton />
     </div>
   );
 };

@@ -98,6 +98,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           description: p.description,
           price: p.price,
           type: p.type || 'timeline',
+          image_url: p.image_url || undefined,
+          calendly_url: p.calendly_url || undefined,
+          media_url: p.media_url || undefined,
+          media_type: p.media_type || undefined,
           features: (p.product_features || [])
             .sort((a: any, b: any) => a.display_order - b.display_order)
             .map((f: any) => f.feature_text)
@@ -532,7 +536,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             title: item.title,
             description: item.description,
             price: item.price,
-            type: item.type || 'timeline'
+            type: item.type || 'timeline',
+            image_url: item.image_url || null,
+            calendly_url: item.calendly_url || null,
+            media_url: item.media_url || null,
+            media_type: item.media_type || null
           })
           .select()
           .single();
@@ -573,7 +581,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             title: item.title,
             description: item.description,
             price: item.price,
-            type: item.type || 'timeline'
+            type: item.type || 'timeline',
+            image_url: item.image_url || null,
+            calendly_url: item.calendly_url || null,
+            media_url: item.media_url || null,
+            media_type: item.media_type || null
           })
           .eq('id', id);
         

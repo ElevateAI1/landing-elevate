@@ -6,6 +6,10 @@ export interface Service {
   price: string;
   features: string[];
   type?: 'timeline' | 'development'; // 'timeline' para los 3 primeros, 'development' para desarrollos
+  image_url?: string;
+  calendly_url?: string;
+  media_url?: string; // Para timeline: imagen o video en el área gráfica
+  media_type?: 'image' | 'video'; // Tipo de media para timeline
 }
 
 export interface Testimonial {

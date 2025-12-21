@@ -5,6 +5,7 @@ import { useData } from '../../contexts/DataContext';
 import { Trash2, Plus, Edit, Save, X, Terminal, Users, Box, MessageSquare, Building2 } from 'lucide-react';
 import { Service, BlogPost, Partner, Testimonial, TeamMember } from '../../types';
 import { ImageUpload } from './ImageUpload';
+import { MediaUpload } from './MediaUpload';
 import { generateUUID } from '../../lib/utils';
 
 type AdminTab = 'blogs' | 'partners' | 'products' | 'testimonials' | 'industries' | 'team';
@@ -126,14 +127,18 @@ const ProductManager = () => {
     description: '',
     price: '',
     features: [],
-    type: 'timeline'
+    type: 'timeline',
+    image_url: '',
+    calendly_url: '',
+    media_url: '',
+    media_type: 'image'
   });
 
   const timelineProducts = products.filter(p => p.type === 'timeline' || !p.type);
   const developmentProducts = products.filter(p => p.type === 'development');
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', price: '', features: [], type: activeSection });
+    setFormData({ title: '', description: '', price: '', features: [], type: activeSection, image_url: '', calendly_url: '', media_url: '', media_type: 'image' });
     setIsAdding(false);
     setEditingId(null);
   };
@@ -147,7 +152,11 @@ const ProductManager = () => {
       description: formData.description,
       price: formData.price,
       features: formData.features || [],
-      type: formData.type || activeSection
+      type: formData.type || activeSection,
+      image_url: formData.image_url,
+      calendly_url: formData.calendly_url,
+      media_url: formData.media_url,
+      media_type: formData.media_type || 'image'
     };
 
     if (editingId) {
@@ -239,6 +248,27 @@ const ProductManager = () => {
                   onChange={(e) => setFormData({...formData, features: e.target.value.split('\n').filter(f => f.trim())})}
                 />
               </div>
+              <ImageUpload
+                currentImage={formData.image_url}
+                onImageChange={(url) => setFormData({ ...formData, image_url: url })}
+                folder="products"
+                label="Imagen del Producto"
+              />
+              <input 
+                className="w-full bg-transparent border-b border-gray-700 p-2 text-white focus:border-emerald-500 outline-none"
+                placeholder="URL de Calendly (ej: https://calendly.com/usuario/reunion)"
+                value={formData.calendly_url || ''}
+                onChange={(e) => setFormData({...formData, calendly_url: e.target.value})}
+              />
+              {activeSection === 'timeline' && (
+                <MediaUpload
+                  currentMedia={formData.media_url}
+                  currentMediaType={formData.media_type}
+                  onMediaChange={(url, type) => setFormData({ ...formData, media_url: url, media_type: type })}
+                  folder="products"
+                  label="Media del Área Gráfica (Imagen o Video)"
+                />
+              )}
               <div className="flex gap-2">
                 <button onClick={handleSave} className="px-4 py-2 bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition-colors">
                   <Save size={16} className="inline mr-2" />
@@ -258,7 +288,7 @@ const ProductManager = () => {
         </h3>
         <button 
           onClick={() => { 
-            setFormData({ title: '', description: '', price: '', features: [], type: activeSection });
+            setFormData({ title: '', description: '', price: '', features: [], type: activeSection, image_url: '', calendly_url: '', media_url: '', media_type: 'image' });
             setIsAdding(true); 
           }} 
           className="flex items-center gap-2 text-emerald-500 hover:text-white transition-colors"

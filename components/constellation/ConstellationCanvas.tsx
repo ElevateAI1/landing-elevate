@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export interface ConstellationPartner {
@@ -44,100 +44,7 @@ interface ConstellationCanvasProps {
   onPartnerPositionUpdate?: (partnerId: string, position: { x: number; y: number }) => void;
 }
 
-// Generar posiciones según patrones
-const generatePartnerPosition = (
-  index: number,
-  total: number,
-  pattern: 'circle' | 'spiral' | 'cluster',
-  category?: string,
-  centerX?: number,
-  centerY?: number
-): { x: number; y: number; z: number } => {
-  const cx = centerX || (typeof window !== 'undefined' ? window.innerWidth / 2 : 0);
-  const cy = centerY || (typeof window !== 'undefined' ? window.innerHeight / 2 : 0);
-  const maxRadius = Math.min(window.innerWidth || 1920, window.innerHeight || 1080) * 0.35;
-  
-  // Área protegida alrededor del nodo central (radio del nodo + padding)
-  // El nodo central tiene aproximadamente 60px de radio (w-60 h-60 = 240px / 2 = 120px)
-  const nodeRadius = 120; // Radio del nodo central
-  const minRadius = nodeRadius + 80; // Radio mínimo para evitar partners dentro del área del nodo
-  
-  // Función para verificar si una posición está dentro del área protegida
-  const isInProtectedArea = (x: number, y: number): boolean => {
-    const distance = Math.sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2));
-    return distance < minRadius;
-  };
-  
-  // Almacenar posiciones generadas para evitar colisiones
-  const generatedPositions: { x: number; y: number }[] = [];
-  const minDistanceBetweenNodes = 100; // Distancia mínima entre nodos
-  
-  // Función para verificar colisiones con otros nodos
-  const hasCollision = (x: number, y: number, existingPositions: { x: number; y: number }[]): boolean => {
-    for (const pos of existingPositions) {
-      const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
-      if (distance < minDistanceBetweenNodes) {
-        return true;
-      }
-    }
-    return false;
-  };
-  
-  // Función para generar posición y verificar que no esté en área protegida ni colisione
-  const generateSafePosition = (
-    baseX: number,
-    baseY: number,
-    existingPositions: { x: number; y: number }[],
-    maxAttempts: number = 20
-  ): { x: number; y: number; z: number } => {
-    let x = baseX;
-    let y = baseY;
-    let attempts = 0;
-    
-    // Si está en área protegida, moverlo hacia afuera
-    if (isInProtectedArea(x, y)) {
-      const angle = Math.atan2(y - cy, x - cx);
-      // Moverlo justo fuera del área protegida
-      x = cx + Math.cos(angle) * minRadius;
-      y = cy + Math.sin(angle) * minRadius;
-    }
-    
-    // Verificar colisiones y ajustar si es necesario
-    while (hasCollision(x, y, existingPositions) && attempts < maxAttempts) {
-      const angle = Math.atan2(y - cy, x - cx);
-      const currentDistance = Math.sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2));
-      // Moverlo un poco más lejos
-      const newDistance = currentDistance + minDistanceBetweenNodes * 0.5;
-      x = cx + Math.cos(angle) * newDistance;
-      y = cy + Math.sin(angle) * newDistance;
-      attempts++;
-    }
-    
-    // Si aún hay colisión después de los intentos, usar posición aleatoria
-    if (hasCollision(x, y, existingPositions)) {
-      const randomAngle = Math.random() * Math.PI * 2;
-      const randomRadius = minRadius + Math.random() * (maxRadius - minRadius);
-      x = cx + Math.cos(randomAngle) * randomRadius;
-      y = cy + Math.sin(randomAngle) * randomRadius;
-      
-      // Verificar una vez más
-      let finalAttempts = 0;
-      while (hasCollision(x, y, existingPositions) && finalAttempts < 10) {
-        const angle = Math.random() * Math.PI * 2;
-        const radius = minRadius + Math.random() * (maxRadius - minRadius);
-        x = cx + Math.cos(angle) * radius;
-        y = cy + Math.sin(angle) * radius;
-        finalAttempts++;
-      }
-    }
-    
-    return { x, y, z: Math.random() * 200 };
-  };
-  
-  // Esta función ahora se maneja dentro del useEffect donde se inicializan los partners
-  // para poder acceder a las posiciones ya generadas
-  return { x: cx, y: cy, z: 0 }; // Placeholder, se reemplazará en el useEffect
-};
+// Position generation is now handled directly in the useEffect where partners are initialized
 
 const ConstellationCanvas: React.FC<ConstellationCanvasProps> = ({
   partners,
@@ -161,7 +68,6 @@ const ConstellationCanvas: React.FC<ConstellationCanvasProps> = ({
   const [hoveredPartner, setHoveredPartner] = useState<ConstellationPartner | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const backgroundOpacityRef = useRef(1);
-  const [backgroundOpacity, setBackgroundOpacity] = useState(1);
 
   // Actualizar referencias del mouse
   useEffect(() => {
@@ -311,7 +217,7 @@ const ConstellationCanvas: React.FC<ConstellationCanvasProps> = ({
     const newPartners = partners.filter(p => !existingPartnerStars.has(p.id));
     const generatedPositionsForNew: { x: number; y: number }[] = [...allExistingPositions];
     
-    partnerStarsRef.current = partners.map((partner, index) => {
+    partnerStarsRef.current = partners.map((partner) => {
       // Si el partner ya existe, usar su posición existente
       const existingStar = existingPartnerStars.get(partner.id);
       if (existingStar) {
@@ -485,13 +391,8 @@ const ConstellationCanvas: React.FC<ConstellationCanvasProps> = ({
       if (Math.abs(opacityDiff) > 0.01) {
         // Interpolación suave con easing
         backgroundOpacityRef.current += opacityDiff * 0.08;
-        // Actualizar state solo ocasionalmente para evitar re-renders excesivos
-        if (Math.abs(opacityDiff) < 0.05 || Math.random() < 0.1) {
-          setBackgroundOpacity(backgroundOpacityRef.current);
-        }
       } else {
         backgroundOpacityRef.current = targetOpacity;
-        setBackgroundOpacity(targetOpacity);
       }
 
       // Dibujar estrellas de fondo
@@ -847,7 +748,6 @@ const PartnerTooltip: React.FC<PartnerTooltipProps> = ({ partner, position }) =>
   // Determinar mejor posición según espacio disponible
   const spaceTop = position.y;
   const spaceBottom = window.innerHeight - position.y;
-  const spaceLeft = position.x;
   const spaceRight = window.innerWidth - position.x;
   
   let left: number;

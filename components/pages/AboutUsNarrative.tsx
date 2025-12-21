@@ -161,7 +161,7 @@ const TeamMemberCard = ({
         style={{
           boxShadow: isHovered ? '0 0 40px rgba(16, 185, 129, 0.4)' : '0 0 0px rgba(16, 185, 129, 0)',
         }}
-        className="relative bg-neutral-900/70 backdrop-blur-xl border border-emerald-500/20 p-8 rounded-lg overflow-hidden group hover:border-emerald-500/60 transition-all duration-500"
+        className="relative bg-neutral-900/70 backdrop-blur-xl border border-emerald-500/20 p-8 rounded-lg overflow-hidden group hover:border-emerald-500/60 transition-all duration-500 h-[400px] flex flex-col"
       >
         {/* Background Glow */}
         <motion.div
@@ -184,23 +184,23 @@ const TeamMemberCard = ({
         )}
 
         {/* Content */}
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col flex-1">
           {/* Avatar Placeholder */}
           <motion.div
             whileHover={{ scale: 1.1, rotate: 360 }}
             transition={{ duration: 0.6 }}
-            className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-full flex items-center justify-center font-mono text-emerald-100 font-bold text-2xl shadow-lg shadow-emerald-500/30"
+            className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-full flex items-center justify-center font-mono text-emerald-100 font-bold text-2xl shadow-lg shadow-emerald-500/30 flex-shrink-0"
           >
             {member.name.charAt(0)}
           </motion.div>
 
-          <h3 className="font-display text-2xl md:text-3xl text-white mb-2 group-hover:text-emerald-400 transition-colors">
+          <h3 className="font-display text-2xl md:text-3xl text-white mb-2 group-hover:text-emerald-400 transition-colors flex-shrink-0">
             {member.name}
           </h3>
-          <div className="font-mono text-sm text-emerald-500 mb-4 uppercase tracking-widest">
+          <div className="font-mono text-sm text-emerald-500 mb-4 uppercase tracking-widest flex-shrink-0">
             {member.role}
           </div>
-          <p className="font-mono text-gray-400 text-sm md:text-base leading-relaxed">
+          <p className="font-mono text-gray-400 text-sm md:text-base leading-relaxed flex-1 overflow-hidden">
             {member.bio}
           </p>
         </div>

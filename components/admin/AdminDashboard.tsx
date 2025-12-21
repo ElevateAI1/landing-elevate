@@ -792,12 +792,22 @@ const TeamManager = () => {
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
             />
-            <textarea 
-              className="w-full bg-transparent border-b border-gray-700 p-2 text-white focus:border-emerald-500 outline-none min-h-[80px]"
-              placeholder="Biografía"
-              value={formData.bio}
-              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-            />
+            <div className="relative">
+              <textarea 
+                className="w-full bg-transparent border-b border-gray-700 p-2 text-white focus:border-emerald-500 outline-none min-h-[80px]"
+                placeholder="Biografía (máximo 350 caracteres)"
+                value={formData.bio}
+                maxLength={350}
+                onChange={(e) => {
+                  if (e.target.value.length <= 350) {
+                    setFormData({ ...formData, bio: e.target.value });
+                  }
+                }}
+              />
+              <div className="text-right text-xs text-gray-500 mt-1">
+                {formData.bio?.length || 0} / 350 caracteres
+              </div>
+            </div>
             <ImageUpload
               currentImage={formData.image_url}
               onImageChange={(url) => setFormData({ ...formData, image_url: url })}

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Image as ImageIcon, Video, FileVideo } from 'lucide-react';
+import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { uploadImage } from '../../lib/supabase';
 
 interface MediaUploadProps {

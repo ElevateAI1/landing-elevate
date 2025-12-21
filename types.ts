@@ -5,6 +5,7 @@ export interface Service {
   description: string;
   price: string;
   features: string[];
+  type?: 'timeline' | 'development'; // 'timeline' para los 3 primeros, 'development' para desarrollos
 }
 
 export interface Testimonial {

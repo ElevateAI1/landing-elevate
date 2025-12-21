@@ -176,7 +176,7 @@ const IntelligenceNarrative: React.FC = () => {
                              />
                          </div>
                          
-                         <div className="p-8 md:p-12 w-full md:w-1/2 relative">
+                         <div className="p-8 md:p-12 pb-8 md:pb-12 w-full md:w-1/2 relative flex flex-col min-h-0">
                              {/* Decorative Background Text */}
                              <div className="absolute inset-0 overflow-hidden opacity-5 pointer-events-none">
                                 <div className="font-mono text-[8px] leading-3 p-4 text-emerald-500 break-all">
@@ -184,7 +184,7 @@ const IntelligenceNarrative: React.FC = () => {
                                 </div>
                              </div>
 
-                             <div className="relative z-10">
+                             <div className="relative z-10 flex flex-col flex-1">
                                 <div className="font-mono text-emerald-500 text-xs tracking-widest mb-4 flex items-center gap-2">
                                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
                                     ACCESSING FILE: {selectedPost.id}
@@ -201,7 +201,7 @@ const IntelligenceNarrative: React.FC = () => {
                                     <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                                 </div>
 
-                                <div className="flex gap-4 mt-8">
+                                <div className="flex gap-4 mt-8 mb-4">
                                     <button 
                                         onClick={(e) => {
                                             e.stopPropagation();

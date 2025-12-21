@@ -24,6 +24,7 @@ const SERVICES_EN: Service[] = [
     description: 'The entry point. A deep-dive operational analysis to map risks and opportunities.',
     price: 'USD 2,000 | 6 Hours',
     features: ['Process Mapping', 'Risk Analysis', 'AI Roadmap', 'Business Case ROI'],
+    type: 'timeline',
   },
   {
     id: 'deploy',
@@ -31,6 +32,7 @@ const SERVICES_EN: Service[] = [
     description: 'Forward-deployed engineering teams building custom architecture within your ecosystem.',
     price: 'Custom Pricing',
     features: ['Dedicated Team', 'Legacy Integration', 'Custom Dev', 'Tech Transfer'],
+    type: 'timeline',
   },
   {
     id: 'gov',
@@ -38,6 +40,7 @@ const SERVICES_EN: Service[] = [
     description: 'Compliance-by-design frameworks ensuring your AI remains an asset, not a liability.',
     price: 'Retainer Model',
     features: ['Compliance Framework', 'Continuous Audit', 'Policy Ops', 'Exec Reporting'],
+    type: 'timeline',
   },
 ];
 
@@ -48,6 +51,7 @@ const SERVICES_ES: Service[] = [
     description: 'El punto de entrada. Un análisis operativo profundo para mapear riesgos y oportunidades.',
     price: 'USD 2,000 | 6 Horas',
     features: ['Mapeo de Procesos', 'Análisis de Riesgos', 'Hoja de Ruta IA', 'ROI de Caso de Negocio'],
+    type: 'timeline',
   },
   {
     id: 'deploy',
@@ -55,6 +59,7 @@ const SERVICES_ES: Service[] = [
     description: 'Equipos de ingeniería desplegados construyendo arquitectura personalizada dentro de su ecosistema.',
     price: 'Precio Personalizado',
     features: ['Equipo Dedicado', 'Integración Legacy', 'Desarrollo Custom', 'Transferencia Tecnológica'],
+    type: 'timeline',
   },
   {
     id: 'gov',
@@ -62,6 +67,7 @@ const SERVICES_ES: Service[] = [
     description: 'Marcos de cumplimiento por diseño asegurando que su IA siga siendo un activo, no un pasivo.',
     price: 'Modelo de Retención',
     features: ['Marco de Cumplimiento', 'Auditoría Continua', 'Ops de Políticas', 'Reportes Ejecutivos'],
+    type: 'timeline',
   },
 ];
 

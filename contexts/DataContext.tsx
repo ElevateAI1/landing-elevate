@@ -97,6 +97,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           title: p.title,
           description: p.description,
           price: p.price,
+          type: p.type || 'timeline',
           features: (p.product_features || [])
             .sort((a: any, b: any) => a.display_order - b.display_order)
             .map((f: any) => f.feature_text)
@@ -530,7 +531,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             id: item.id,
             title: item.title,
             description: item.description,
-            price: item.price
+            price: item.price,
+            type: item.type || 'timeline'
           })
           .select()
           .single();
@@ -570,7 +572,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           .update({
             title: item.title,
             description: item.description,
-            price: item.price
+            price: item.price,
+            type: item.type || 'timeline'
           })
           .eq('id', id);
         

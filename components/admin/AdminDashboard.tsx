@@ -120,15 +120,20 @@ const ProductManager = () => {
   const { products, deleteProduct, addProduct, updateProduct } = useData();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<'timeline' | 'development'>('timeline');
   const [formData, setFormData] = useState<Partial<Service>>({
     title: '',
     description: '',
     price: '',
-    features: []
+    features: [],
+    type: 'timeline'
   });
 
+  const timelineProducts = products.filter(p => p.type === 'timeline' || !p.type);
+  const developmentProducts = products.filter(p => p.type === 'development');
+
   const resetForm = () => {
-    setFormData({ title: '', description: '', price: '', features: [] });
+    setFormData({ title: '', description: '', price: '', features: [], type: activeSection });
     setIsAdding(false);
     setEditingId(null);
   };
@@ -141,7 +146,8 @@ const ProductManager = () => {
       title: formData.title,
       description: formData.description,
       price: formData.price,
-      features: formData.features || []
+      features: formData.features || [],
+      type: formData.type || activeSection
     };
 
     if (editingId) {
@@ -155,6 +161,7 @@ const ProductManager = () => {
   const startEdit = (product: Service) => {
     setFormData(product);
     setEditingId(product.id);
+    setActiveSection(product.type || 'timeline');
     setIsAdding(true);
   };
 
@@ -162,8 +169,29 @@ const ProductManager = () => {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl text-gray-400">/ MNT / SERVICIOS</h2>
-        <button onClick={() => { resetForm(); setIsAdding(true); }} className="flex items-center gap-2 text-emerald-500 hover:text-white transition-colors">
-            <Plus size={18} /> NUEVA ENTRADA
+      </div>
+
+      {/* Section Tabs */}
+      <div className="flex gap-4 mb-8 border-b border-white/10">
+        <button
+          onClick={() => { setActiveSection('timeline'); resetForm(); }}
+          className={`px-6 py-3 font-bold transition-colors ${
+            activeSection === 'timeline'
+              ? 'text-emerald-500 border-b-2 border-emerald-500'
+              : 'text-gray-500 hover:text-white'
+          }`}
+        >
+          TIMELINE
+        </button>
+        <button
+          onClick={() => { setActiveSection('development'); resetForm(); }}
+          className={`px-6 py-3 font-bold transition-colors ${
+            activeSection === 'development'
+              ? 'text-emerald-500 border-b-2 border-emerald-500'
+              : 'text-gray-500 hover:text-white'
+          }`}
+        >
+          DESARROLLOS
         </button>
       </div>
 
@@ -173,6 +201,17 @@ const ProductManager = () => {
             animate={{ opacity: 1, height: 'auto' }}
             className="mb-8 p-6 border border-emerald-500/30 bg-emerald-900/5 space-y-4"
           >
+              <div className="flex items-center gap-4 mb-4">
+                <label className="text-sm text-gray-400">Tipo:</label>
+                <select
+                  className="bg-transparent border border-gray-700 p-2 text-white focus:border-emerald-500 outline-none"
+                  value={formData.type || activeSection}
+                  onChange={(e) => setFormData({...formData, type: e.target.value as 'timeline' | 'development'})}
+                >
+                  <option value="timeline">Timeline</option>
+                  <option value="development">Desarrollo</option>
+                </select>
+              </div>
               <input 
                 className="w-full bg-transparent border-b border-gray-700 p-2 text-white focus:border-emerald-500 outline-none"
                 placeholder="Título del Servicio"
@@ -213,11 +252,31 @@ const ProductManager = () => {
           </motion.div>
       )}
 
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-lg text-gray-500">
+          {activeSection === 'timeline' ? 'TIMELINE' : 'DESARROLLOS'}
+        </h3>
+        <button 
+          onClick={() => { 
+            setFormData({ title: '', description: '', price: '', features: [], type: activeSection });
+            setIsAdding(true); 
+          }} 
+          className="flex items-center gap-2 text-emerald-500 hover:text-white transition-colors"
+        >
+          <Plus size={18} /> NUEVA ENTRADA
+        </button>
+      </div>
+
       <div className="grid gap-4">
-        {products.map(p => (
+        {(activeSection === 'timeline' ? timelineProducts : developmentProducts).map(p => (
           <div key={p.id} className="flex justify-between items-start p-6 border border-white/5 bg-white/5 hover:border-white/20 transition-all">
             <div className="flex-1">
-              <div className="font-display text-xl mb-1">{p.title}</div>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="font-display text-xl">{p.title}</div>
+                <span className="text-xs px-2 py-1 bg-emerald-900/30 text-emerald-400 rounded">
+                  {p.type === 'timeline' ? 'TIMELINE' : 'DESARROLLO'}
+                </span>
+              </div>
               <div className="text-xs text-gray-500 uppercase mb-2">{p.price}</div>
               <div className="text-sm text-gray-400 mb-2">{p.description}</div>
               <div className="flex flex-wrap gap-2 mt-2">

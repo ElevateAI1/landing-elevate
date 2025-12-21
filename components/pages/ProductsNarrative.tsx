@@ -88,6 +88,10 @@ const TiltCard: React.FC<TiltCardProps> = ({ children, index }) => {
 const ProductsNarrative: React.FC = () => {
   const { products } = useData();
   const { scrollY } = useScroll();
+  
+  // Separar productos por tipo
+  const timelineProducts = products.filter(p => p.type === 'timeline' || !p.type).slice(0, 3);
+  const developmentProducts = products.filter(p => p.type === 'development');
 
   return (
     <div className="min-h-screen bg-[#050505] pt-24 pb-20 overflow-hidden relative">
@@ -140,7 +144,7 @@ const ProductsNarrative: React.FC = () => {
             </div>
 
             <div className="space-y-40">
-                {products.map((product, index) => {
+                {timelineProducts.map((product, index) => {
                     const isEven = index % 2 === 0;
                     return (
                         <div key={product.id} className={`flex flex-col md:flex-row gap-12 items-center ${isEven ? '' : 'md:flex-row-reverse'}`}>
@@ -222,6 +226,109 @@ const ProductsNarrative: React.FC = () => {
                 TOTAL CAPABILITY ASSURANCE
             </motion.h3>
         </div>
+
+        {/* Development Products Section */}
+        {developmentProducts.length > 0 && (
+          <div className="mt-40 relative">
+            {/* Section Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="mb-32 text-center"
+            >
+              <motion.div 
+                initial={{ width: 0 }} 
+                whileInView={{ width: "100px" }} 
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="h-1 bg-emerald-500 mx-auto mb-6"
+              />
+              <motion.h2 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="font-display text-4xl md:text-6xl text-white mb-6"
+              >
+                NUESTROS DESARROLLOS
+              </motion.h2>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="font-mono text-gray-400 text-lg max-w-2xl mx-auto"
+              >
+                Soluciones personalizadas construidas para entornos de producción críticos
+              </motion.p>
+            </motion.div>
+
+            {/* Development Products Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {developmentProducts.map((product, index) => (
+                <TiltCard key={product.id} index={index}>
+                  <div className="w-full aspect-square bg-[#0a0a0a] border border-white/10 relative overflow-hidden p-8 flex flex-col justify-between group transition-colors duration-500 shadow-[0_0_30px_rgba(0,0,0,0.5)] transform-style-3d hover:border-emerald-500/50">
+                    
+                    {/* Holographic Grid on Card */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20" />
+                    
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    <div className="flex justify-between items-start translate-z-10">
+                      <div className="font-mono text-xs text-emerald-500 tracking-widest uppercase bg-emerald-900/20 px-2 py-1 rounded">
+                        DEV-{index + 1}
+                      </div>
+                      <div className="text-white/20 group-hover:text-emerald-400 transition-colors transform group-hover:scale-110 duration-300">
+                        <Cpu size={40} />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4 translate-z-20">
+                      <div>
+                        <h3 className="font-display text-2xl text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                          {product.title}
+                        </h3>
+                        <div className="font-mono text-xs text-emerald-500 mb-4">
+                          {product.price}
+                        </div>
+                        <p className="text-gray-400 font-mono text-sm leading-relaxed mb-4">
+                          {product.description}
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {product.features.slice(0, 3).map((_f, i) => (
+                          <div key={i} className="group/bar">
+                            <div className="flex justify-between text-[10px] text-gray-500 font-mono mb-1">
+                              <span>FEATURE_{i + 1}</span>
+                              <span>{(Math.random() * 100).toFixed(0)}%</span>
+                            </div>
+                            <div className="h-1 bg-gray-800 rounded overflow-hidden">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                whileInView={{ width: `${Math.random() * 60 + 40}%` }}
+                                transition={{ duration: 1.5, delay: 0.5 + (i * 0.2) }}
+                                className="h-full bg-emerald-500 group-hover/bar:bg-white transition-colors" 
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <button className="group flex items-center gap-2 text-white hover:text-emerald-500 transition-colors font-bold tracking-widest uppercase text-xs border border-white/20 px-4 py-2 hover:bg-emerald-900/20 hover:border-emerald-500/50 mt-4">
+                        Ver Detalles <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform"/>
+                      </button>
+                    </div>
+                  </div>
+                  {/* Shadow */}
+                  <div className="absolute -bottom-10 left-10 right-10 h-10 bg-emerald-500/20 blur-[40px] opacity-50 transform translate-z-[-50px]" />
+                </TiltCard>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
